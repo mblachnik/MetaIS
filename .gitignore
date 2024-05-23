@@ -1,6 +1,8 @@
 Original*Datasets/
 Filtered by*/
 all_pictures/
+data/*
+models/*
 __pycache__/
 .idea/
 .vscode/
