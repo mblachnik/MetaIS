@@ -16,7 +16,7 @@ files = [(r, f.replace(".csv",""), ".csv")
 
 #Ładowanie plików i uruchomienie procesu uczenia meta-modelu
 Xs, ys, fNamess = loadMetaFromDatasets(files)
-Xs = [x[:,:2] for x in Xs]
+
 X = np.vstack(Xs) #Sklejenie części X
 y = np.hstack(ys) #Sklejenie części y
 model = train(X,y) #Nauczenie meta modelu
