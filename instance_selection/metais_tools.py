@@ -61,6 +61,7 @@ def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], do
         X = df.loc[:, [c for c in dfX.columns if c not in dropColumns]]
         y = df.loc[:, "_weight_"]
         X_meta = metaTransformer.fit_transform(X,y)
+        #X_meta = metaTransformer.transform(X,y) PC
         if doSave:
             df_toSave = pd.concat([X_meta,y],axis=1)
             df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
