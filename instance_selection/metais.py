@@ -30,7 +30,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         #The implementation comes here
-        return X
+        return X[:,:3]
 
 
 class MetaIS(BaseUnderSampler):
