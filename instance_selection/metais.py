@@ -11,6 +11,9 @@ from imblearn.utils import Substitution
 from imblearn.utils._docstring import _random_state_docstring
 from imblearn.utils._param_validation import HasMethods, StrOptions
 from imblearn.under_sampling.base import BaseUnderSampler
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics.pairwise import euclidean_distances
+import statistics
 
 VOTING_KIND = ("auto", "hard", "soft")
 
@@ -23,14 +26,71 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, by=1, columns=None):
         self.by = by
         self.columns = columns
-        self.metaAttributTransformers = {}
+        self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass"]
+        self.k_values = [3,5,9,15,23,33]
+        for mat in self.k_values:
+            strMat = str(mat)
+            self.metaAttributTransformers.append('sameClassNeighbors' + strMat)
+            self.metaAttributTransformers.append('meanDistanceAny' + strMat)
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
-        #The implementation comes here
-        return X[:,:3]
+        n = max(self.k_values) + 1
+        neigh = NearestNeighbors(n_neighbors=n, metric="euclidean") 
+        neigh.fit(X,y)
+
+        newX = dict()
+
+        for metaParam in self.metaAttributTransformers:
+            newX[metaParam] = []
+        
+        arguments_count = X.shape[1]
+
+        for index, row in X.iterrows():
+            neighbors = neigh.kneighbors([row], return_distance=True)
+            sameRowFound = False
+            anyClassDistance = []
+            sameClassNeighborsCount = 0
+            firstSameClassNeighborFound = False
+            firstOppositeClassNeighborFound = False
+            newX["id"].append(index + 1)
+
+            for i in range(n):
+                id = int(neighbors[1][0][i])
+                if sameRowFound == False:
+                    if id == index:
+                        sameRowFound = True
+                        continue
+                    elif i == n - 1:
+                        break
+
+                is_same_class = y[id] == y[index]
+                normalized_distance = (neighbors[0][0][i]**2)/arguments_count
+                anyClassDistance.append(normalized_distance)
+                if is_same_class:
+                    sameClassNeighborsCount += 1
+                    if firstSameClassNeighborFound == False:
+                        newX['minDistanceSameClass'].append(normalized_distance)
+                        firstSameClassNeighborFound = True
+                elif firstOppositeClassNeighborFound == False:
+                    newX['minDistanceOppositeClass'].append(normalized_distance)
+                    firstOppositeClassNeighborFound = True
+                        
+                current_k = i if sameRowFound else i + 1
+                if current_k in self.k_values:
+                    strK = str(current_k)
+                    newX['sameClassNeighbors' + strK].append(sameClassNeighborsCount)
+                    newX['meanDistanceAny' + strK].append(statistics.mean(anyClassDistance))
+
+            if firstSameClassNeighborFound == False:
+                newX['minDistanceSameClass'].append(-1)
+            elif firstOppositeClassNeighborFound == False:
+                newX['minDistanceOppositeClass'].append(-1)
+                    
+        result = pd.DataFrame.from_dict(newX)
+        return result
 
 
 class MetaIS(BaseUnderSampler):
