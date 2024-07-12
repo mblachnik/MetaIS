@@ -23,11 +23,11 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     The meta-attributes should represent average distance to its neighbors,
     average distance to its nearest enemy or nearest neighbor to the same class
     """
-    def __init__(self, by=1, columns=None):
+    def __init__(self, by=1, columns=None, k_values=[3,5,9,15,23,33]):
         self.by = by
         self.columns = columns
         self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass"]
-        self.k_values = [3,5,9,15,23,33]
+        self.k_values = k_values
         for mat in self.k_values:
             strMat = str(mat)
             self.metaAttributTransformers.append('sameClassNeighbors' + strMat)
@@ -55,7 +55,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
-            newX["id"].append(index + 1)
+            newX["id"].append(index + 1) #MB: Dlaczego tutaj jest +1?
 
             for i in range(n):
                 id = int(neighbors[1][0][i])
@@ -67,12 +67,13 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                         break
 
                 is_same_class = y[id] == y[index]
+                #ToDo: Sprawdzić czy neighbors jest posortowany
                 normalized_distance = (neighbors[0][0][i]**2)/arguments_count
                 anyClassDistance.append(normalized_distance)
                 if is_same_class:
                     sameClassNeighborsCount += 1
                     if firstSameClassNeighborFound == False:
-                        newX['minDistanceSameClass'].append(normalized_distance)
+                        newX['minDistanceSameClass'].append(normalized_distance)  #ToDo: Proponuję te nzwy kolum ze stringów zamienić na obiekt typu @dataclass frozen bo inaczej łatwo jest zrobić literówkę, to samo w pozostałych nazwach stringów
                         firstSameClassNeighborFound = True
                 elif firstOppositeClassNeighborFound == False:
                     newX['minDistanceOppositeClass'].append(normalized_distance)
