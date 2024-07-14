@@ -26,12 +26,15 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, by=1, columns=None):
         self.by = by
         self.columns = columns
-        self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass"]
+        self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass", "minDistanceAnyClass"]
         self.k_values = [3,5,9,15,23,33]
         for mat in self.k_values:
             strMat = str(mat)
             self.metaAttributTransformers.append('sameClassNeighbors' + strMat)
-            self.metaAttributTransformers.append('meanDistanceAny' + strMat)
+            self.metaAttributTransformers.append('oppositeClassNeighbors' + strMat)
+            self.metaAttributTransformers.append('meanDistanceAnyClass' + strMat)
+            self.metaAttributTransformers.append('meanDistanceSameClass' + strMat)
+            self.metaAttributTransformers.append('meanDistanceOppositeClass' + strMat)
 
     def fit(self, X, y=None):
         return self
@@ -51,7 +54,9 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
 
         for index, row in X.iterrows():
             sameRowFound = False
-            anyClassDistance = []
+            anyClassDistances = []
+            sameClassDistances = []
+            oppositeClassDistances = []
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
@@ -70,27 +75,37 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
 
                 is_same_class = y[id] == y[index]
                 normalized_distance = neigh_distances[i]/arguments_count
-                anyClassDistance.append(normalized_distance)
+                anyClassDistances.append(normalized_distance)
                 if is_same_class:
                     sameClassNeighborsCount += 1
+                    sameClassDistances.append(normalized_distance)
                     if firstSameClassNeighborFound == False:
                         newX['minDistanceSameClass'].append(normalized_distance)
+                        if firstOppositeClassNeighborFound == False:
+                            newX['minDistanceAnyClass'].append(normalized_distance)
                         firstSameClassNeighborFound = True
-                elif firstOppositeClassNeighborFound == False:
-                    newX['minDistanceOppositeClass'].append(normalized_distance)
-                    firstOppositeClassNeighborFound = True
+                else:
+                    oppositeClassDistances.append(normalized_distance)
+                    if firstOppositeClassNeighborFound == False:
+                        newX['minDistanceOppositeClass'].append(normalized_distance)
+                        if firstSameClassNeighborFound == False:
+                            newX['minDistanceAnyClass'].append(normalized_distance)
+                        firstOppositeClassNeighborFound = True
                         
                 current_k = i if sameRowFound else i + 1
                 if current_k in self.k_values:
                     strK = str(current_k)
                     newX['sameClassNeighbors' + strK].append(sameClassNeighborsCount)
-                    newX['meanDistanceAny' + strK].append(statistics.mean(anyClassDistance))
+                    newX['oppositeClassNeighbors' + strK].append(current_k - sameClassNeighborsCount)
+                    newX['meanDistanceAnyClass' + strK].append(statistics.mean(anyClassDistances))
+                    newX['meanDistanceOppositeClass' + strK].append(statistics.mean(oppositeClassDistances) if firstOppositeClassNeighborFound else -1)
+                    newX['meanDistanceSameClass' + strK].append(statistics.mean(sameClassDistances) if firstSameClassNeighborFound else -1)
 
             if firstSameClassNeighborFound == False:
                 newX['minDistanceSameClass'].append(-1)
             elif firstOppositeClassNeighborFound == False:
                 newX['minDistanceOppositeClass'].append(-1)
-                    
+        
         result = pd.DataFrame.from_dict(newX)
         return result
 
