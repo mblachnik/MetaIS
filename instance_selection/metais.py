@@ -38,7 +38,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         n = max(self.k_values) + 1
-        neigh = NearestNeighbors(n_neighbors=n, metric="euclidean") 
+        neigh = NearestNeighbors(n_neighbors=n, metric="sqeuclidean") 
         neigh.fit(X,y)
 
         newX = dict()
@@ -47,18 +47,20 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             newX[metaParam] = []
         
         arguments_count = X.shape[1]
+        distances, indices = neigh.kneighbors(X, return_distance=True)
 
-        for index, row in X.iterrows():
-            neighbors = neigh.kneighbors([row], return_distance=True)
+        for index in X.iterrows():
             sameRowFound = False
             anyClassDistance = []
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
             newX["id"].append(index + 1)
+            neigh_indices = indices[index]
+            neigh_distances = distances[index]
 
             for i in range(n):
-                id = int(neighbors[1][0][i])
+                id = neigh_indices[i]
                 if sameRowFound == False:
                     if id == index:
                         sameRowFound = True
@@ -67,7 +69,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                         break
 
                 is_same_class = y[id] == y[index]
-                normalized_distance = (neighbors[0][0][i]**2)/arguments_count
+                normalized_distance = neigh_distances[i]/arguments_count
                 anyClassDistance.append(normalized_distance)
                 if is_same_class:
                     sameClassNeighborsCount += 1
