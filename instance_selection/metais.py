@@ -39,7 +39,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X, y=None):
+    def transform(self, X, y=None, ids=None):
         n = max(self.k_values) + 1
         neigh = NearestNeighbors(n_neighbors=n, metric="sqeuclidean") 
         neigh.fit(X,y)
@@ -60,7 +60,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
-            newX["id"].append(index + 1)
+            newX["id"].append(ids[index])
             neigh_indices = indices[index]
             neigh_distances = distances[index]
 
