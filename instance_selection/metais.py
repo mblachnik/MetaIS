@@ -49,7 +49,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         arguments_count = X.shape[1]
         distances, indices = neigh.kneighbors(X, return_distance=True)
 
-        for index in X.iterrows():
+        for index, row in X.iterrows():
             sameRowFound = False
             anyClassDistance = []
             sameClassNeighborsCount = 0
