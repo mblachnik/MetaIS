@@ -23,11 +23,11 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     The meta-attributes should represent average distance to its neighbors,
     average distance to its nearest enemy or nearest neighbor to the same class
     """
-    def __init__(self, by=1, columns=None):
+    def __init__(self, by=1, columns=None, k_values=[3,5,9,15,23,33]):
         self.by = by
         self.columns = columns
         self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass", "minDistanceAnyClass"]
-        self.k_values = [3,5,9,15,23,33]
+        self.k_values = k_values
         for mat in self.k_values:
             strMat = str(mat)
             self.metaAttributTransformers.append('sameClassNeighbors' + strMat)
