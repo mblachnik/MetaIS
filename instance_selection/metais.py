@@ -1,8 +1,11 @@
 import pickle
+import statistics
+from meta_attributes_enum import MetaAttributesEnum
 
 import pandas as pd
 import numpy as np
 import numpy as np
+
 from scipy import sparse
 from sklearn.base import clone, BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
@@ -13,7 +16,9 @@ from imblearn.utils._param_validation import HasMethods, StrOptions
 from imblearn.under_sampling.base import BaseUnderSampler
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics.pairwise import euclidean_distances
-import statistics
+
+
+
 
 VOTING_KIND = ("auto", "hard", "soft")
 
@@ -26,15 +31,15 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, by=1, columns=None, k_values=[3,5,9,15,23,33]):
         self.by = by
         self.columns = columns
-        self.metaAttributTransformers = ["id", "minDistanceSameClass", "minDistanceOppositeClass", "minDistanceAnyClass"]
+        self.metaAttributTransformers = [MetaAttributesEnum.id, MetaAttributesEnum.minDistanceSameClass, MetaAttributesEnum.minDistanceOppositeClass, MetaAttributesEnum.minDistanceAnyClass]
         self.k_values = k_values
         for mat in self.k_values:
             strMat = str(mat)
-            self.metaAttributTransformers.append('sameClassNeighbors' + strMat)
-            self.metaAttributTransformers.append('oppositeClassNeighbors' + strMat)
-            self.metaAttributTransformers.append('meanDistanceAnyClass' + strMat)
-            self.metaAttributTransformers.append('meanDistanceSameClass' + strMat)
-            self.metaAttributTransformers.append('meanDistanceOppositeClass' + strMat)
+            self.metaAttributTransformers.append(MetaAttributesEnum.sameClassNeighbors(strMat))
+            self.metaAttributTransformers.append(MetaAttributesEnum.oppositeClassNeighbors(strMat))
+            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceAnyClass(strMat))
+            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceSameClass(strMat))
+            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceOppositeClass(strMat))
 
     def fit(self, X, y=None):
         return self
@@ -60,7 +65,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
-            newX["id"].append(ids[index])
+            newX[MetaAttributesEnum.id].append(ids[index])
             neigh_indices = indices[index]
             neigh_distances = distances[index]
 
@@ -80,31 +85,31 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                     sameClassNeighborsCount += 1
                     sameClassDistances.append(normalized_distance)
                     if firstSameClassNeighborFound == False:
-                        newX['minDistanceSameClass'].append(normalized_distance)
+                        newX[MetaAttributesEnum.minDistanceSameClass].append(normalized_distance)
                         if firstOppositeClassNeighborFound == False:
-                            newX['minDistanceAnyClass'].append(normalized_distance)
+                            newX[MetaAttributesEnum.minDistanceAnyClass].append(normalized_distance)
                         firstSameClassNeighborFound = True
                 else:
                     oppositeClassDistances.append(normalized_distance)
                     if firstOppositeClassNeighborFound == False:
-                        newX['minDistanceOppositeClass'].append(normalized_distance)
+                        newX[MetaAttributesEnum.minDistanceOppositeClass].append(normalized_distance)
                         if firstSameClassNeighborFound == False:
-                            newX['minDistanceAnyClass'].append(normalized_distance)
+                            newX[MetaAttributesEnum.minDistanceAnyClass].append(normalized_distance)
                         firstOppositeClassNeighborFound = True
                         
                 current_k = i if sameRowFound else i + 1
                 if current_k in self.k_values:
                     strK = str(current_k)
-                    newX['sameClassNeighbors' + strK].append(sameClassNeighborsCount)
-                    newX['oppositeClassNeighbors' + strK].append(current_k - sameClassNeighborsCount)
-                    newX['meanDistanceAnyClass' + strK].append(statistics.mean(anyClassDistances))
-                    newX['meanDistanceOppositeClass' + strK].append(statistics.mean(oppositeClassDistances) if firstOppositeClassNeighborFound else -1)
-                    newX['meanDistanceSameClass' + strK].append(statistics.mean(sameClassDistances) if firstSameClassNeighborFound else -1)
+                    newX[MetaAttributesEnum.sameClassNeighbors(strK)].append(sameClassNeighborsCount)
+                    newX[MetaAttributesEnum.oppositeClassNeighbors(strK)].append(current_k - sameClassNeighborsCount)
+                    newX[MetaAttributesEnum.meanDistanceAnyClass(strK)].append(statistics.mean(anyClassDistances))
+                    newX[MetaAttributesEnum.meanDistanceOppositeClass(strK)].append(statistics.mean(oppositeClassDistances) if firstOppositeClassNeighborFound else -1)
+                    newX[MetaAttributesEnum.meanDistanceSameClass(strK)].append(statistics.mean(sameClassDistances) if firstSameClassNeighborFound else -1)
 
             if firstSameClassNeighborFound == False:
-                newX['minDistanceSameClass'].append(-1)
+                newX[MetaAttributesEnum.minDistanceSameClass].append(-1)
             elif firstOppositeClassNeighborFound == False:
-                newX['minDistanceOppositeClass'].append(-1)
+                newX[MetaAttributesEnum.minDistanceOppositeClass].append(-1)
         
         result = pd.DataFrame.from_dict(newX)
         return result
