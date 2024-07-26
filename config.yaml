@@ -1,0 +1,24 @@
+#data_dir: "Y:\\Datasets\\Filtered by CCIS\\coil2000\\"
+data_dir: "Y:\\Datasets\\tmp\\"
+models_dir: "Y:\\MetaIS\\models"
+test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
+datasets: ["abalone",
+            "banana",
+          #"coil2000", #Dokładność 1NN mniejsza niż default
+            "kr-vs-k",
+            "letter",
+            "magic",
+            "marketing",
+            "nursery",
+            "optdigits",
+            "page-blocks",
+            "penbased",
+            "phoneme",
+            "ring",
+            "satimage",
+            "shuttle",
+            "spambase",
+            "splice",
+            "texture",
+            #"thyroid", #Dokładność 1NN mniejsza niż default
+            "twonorm"]

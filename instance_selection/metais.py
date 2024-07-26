@@ -31,7 +31,9 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, by=1, columns=None, k_values=[3,5,9,15,23,33]):
         self.by = by
         self.columns = columns
-        self.metaAttributTransformers = [MetaAttributesEnum.id.value, MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
+        self.metaAttributTransformers = [
+            #MetaAttributesEnum.id.value,
+            MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
         self.k_values = k_values
         for mat in self.k_values:
             strMat = str(mat)
@@ -45,6 +47,8 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None, ids=None):
+        if type(X) is pd.DataFrame:
+            X = X.values
         data_len = len(X)
         max_k = max(self.k_values) + 1
         is_data_len_smaller_than_max_k = data_len < max_k
@@ -61,7 +65,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         arguments_count = X.shape[1]
         distances, indices = neigh.kneighbors(X, return_distance=True)
 
-        for index, row in X.iterrows():
+        for index, row in enumerate(X):
             sameRowFound = False
             anyClassDistances = []
             sameClassDistances = []
@@ -69,7 +73,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
-            newX[MetaAttributesEnum.id.value].append(ids[index])
+            #newX[MetaAttributesEnum.id.value].append(ids[index])
             neigh_indices = indices[index]
             neigh_distances = distances[index]
 

@@ -32,7 +32,7 @@ def store(model,file = "/models/model.pickl"):
     with open(file, 'wb') as f:
         pickle.dump(model, f)
 
-def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False):
+def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False, verbose=True):
     """
     Function takes input list of files and for each file it generates metaattributes. The elements of the list should be
     a tuple (directory_name, file_name, file_extension),
@@ -49,7 +49,10 @@ def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], do
     """
     metaTransformer = ISMetaAttributesTransformer()
     out = []
-    for dir, file, ext in files:
+    for i,(dir, file, ext) in enumerate(files):
+        if verbose:
+            print(f"Iteration {i+1} out of {len(files)}")
+            print(f"Generating meta-attributes for {(dir + os.sep + file)}")
         dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
         dfY = pd.read_csv(dir + os.sep  + file + "_proto"+ext,sep=";")
         dfY.rename(columns={"weight":"_weight_"}, inplace=True)
