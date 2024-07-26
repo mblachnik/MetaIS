@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from instance_selection.metais_tools import loadMetaFromDatasets, train, store, generateMetaForDatasets
 import yaml
 import os
+from tqdm import tqdm
 doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomijamy ten krok
 
 with open('config.yaml', 'r') as file:
@@ -26,8 +27,7 @@ files = [(r, f.replace(".csv",""), ".csv")
 Xs, ys, fNames = loadMetaFromDatasets(files)
 #%%
 #The above function gets a list of X and y of metaattributes for given file, this allows us to combine only selected files and train metamodel only on selected files
-for i,fN in enumerate(fNames): #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
-    print(f"Iteration {i+1} out of {len(fNames)} processing {fN}")
+for fN in tqdm(fNames): #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
     Xx = []
     yy = []
     for Xt,yt,ft in zip(Xs,ys,fNames):

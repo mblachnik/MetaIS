@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+from tqdm import tqdm
 
 from instance_selection.metais import ISMetaAttributesTransformer
 
@@ -49,9 +50,8 @@ def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], do
     """
     metaTransformer = ISMetaAttributesTransformer()
     out = []
-    for i,(dir, file, ext) in enumerate(files):
+    for dir, file, ext in tqdm(files):
         if verbose:
-            print(f"Iteration {i+1} out of {len(files)}")
             print(f"Generating meta-attributes for {(dir + os.sep + file)}")
         dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
         dfY = pd.read_csv(dir + os.sep  + file + "_proto"+ext,sep=";")

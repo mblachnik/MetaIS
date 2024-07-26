@@ -24,17 +24,15 @@ files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] i
 #%%
 ress = []
 
-for dir_name, dat_name, dat_ext, dat in tqdm(files):
-
-    X_train, y_train = tools.read_data(os.path.join(dir_name,
-                                                    dat_name+dat_ext))
+for i,(dir_name, dat_name, dat_ext, dat) in  enumerate(files):
+    print(f"{i}/{len(files)}")
+    Xp_train, yp_train, stats = tools.read_data_and_IS(os.path.join(dir_name,
+                                                    dat_name+dat_ext),
+                                              os.path.join(dir_name,
+                                                           dat_name + "_proto" + dat_ext)
+                                              )
     X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
                                                     dat_name.replace("tra", "tst")))
-
-    model_path = os.path.join(config["models_dir"], f"model_{dat}.dat_meta.pickl")
-    model_meta = MetaIS(estimator_src=model_path, threshold=0.3)
-
-    Xp_train,yp_train = model_meta.fit_resample(X_train, y_train)
 
     model_mis = knn.KNeighborsClassifier(n_neighbors=1)
     model_mis.fit(Xp_train, yp_train)
@@ -42,11 +40,12 @@ for dir_name, dat_name, dat_ext, dat in tqdm(files):
     yp = model_mis.predict(X_test)
     res = tools.score(yp,y_test)
     res["name"] = dat
-    res = res | tools.scoreIS(X_train,Xp_train)
+    res = res | stats
     ress.append(res)
 
 res_df = pd.DataFrame(ress)
-res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS.csv"))
+res_df.to_csv(os.path.join(config["results_dir"],"results_IS_2.csv"))
 perf = res_df.groupby("name").aggregate(["mean","std"])
-perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg.csv"))
+perf.to_csv(os.path.join(config["results_dir"],"results_IS_agg_2.csv"))
 print(perf)
+
