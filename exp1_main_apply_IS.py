@@ -1,3 +1,8 @@
+"""
+A script to perform classical IS based on the proto files.
+Results are sotred the same way as with metaIS
+"""
+
 import pandas as pd
 from  instance_selection.metais import MetaIS
 import sklearn.neighbors as knn

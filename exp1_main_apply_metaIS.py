@@ -1,3 +1,8 @@
+"""
+Script to run MetaIS
+note that first other two scripts must be executed that is it must have metamodel but in order to have meta model first we have to run meta attributes generation
+"""
+
 import pandas as pd
 from  instance_selection.metais import MetaIS
 import sklearn.neighbors as knn
