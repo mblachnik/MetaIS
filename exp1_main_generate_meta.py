@@ -1,3 +1,7 @@
+"""
+A scirpt to generate meta features. It should be run first.
+Note that it reads configuration from config.yaml so prepare that file before run
+"""
 #%%
 from instance_selection.metais_tools import generateMetaForDatasets
 

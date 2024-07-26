@@ -1,8 +1,8 @@
 data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by CCIS\\"
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
 #data_dir: "Y:\\Datasets\\tmp\\"
-models_dir: "Y:\\MetaIS\\models\\CCIS\\"
-results_dir: "Y:\\MetaIS\\results\\CCIS\\"
+models_dir: "Y:\\MetaIS\\models\\CCIS\\" #Location where models are sotred Note that it should be algorithm specific
+results_dir: "Y:\\MetaIS\\results\\CCIS\\" #Location where results of the calculations are stored
 
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [

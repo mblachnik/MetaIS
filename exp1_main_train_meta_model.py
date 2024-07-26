@@ -1,3 +1,9 @@
+"""
+Script to run experiments in which we train meta model based
+on already extracted metafeatures.
+In order to get meatfeatures run exp1_generate_meta.py
+"""
+
 #%%
 import pandas as pd
 import numpy as np

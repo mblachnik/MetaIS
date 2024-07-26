@@ -1,3 +1,7 @@
+"""
+Some simple methods to simplify running the experiments
+"""
+
 import pandas as pd
 from sklearn.metrics import accuracy_score,f1_score,balanced_accuracy_score,matthews_corrcoef
 def read_data(fName):
