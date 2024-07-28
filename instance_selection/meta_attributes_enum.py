@@ -2,8 +2,6 @@ from enum import Enum
 
 class MetaAttributesEnum(Enum):
 
-    id = 'id'
-
     minDistanceSameClass = 'minDistanceSameClass'
 
     minDistanceOppositeClass = 'minDistanceOppositeClass'

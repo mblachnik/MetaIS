@@ -32,7 +32,7 @@ def store(model,file = "/models/model.pickl"):
     with open(file, 'wb') as f:
         pickle.dump(model, f)
 
-def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False):
+def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False, metaTransformer:ISMetaAttributesTransformer = None):
     """
     Function takes input list of files and for each file it generates metaattributes. The elements of the list should be
     a tuple (directory_name, file_name, file_extension),
@@ -59,10 +59,9 @@ def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], do
                              f"It is likely that {file} and {file}_proto do not match")
         dropColumns.append("_weight_")
         X = df.loc[:, [c for c in dfX.columns if c not in dropColumns]]
-        y = df.loc[:, "_weight_"]
-        ids = df.loc[:, "id"] #Pobieramy oryginalne ID
+        y = df.loc[:, "LABEL"]
         #X_meta = metaTransformer.fit_transform(X,y)
-        X_meta = metaTransformer.transform(X,y,ids)
+        X_meta = metaTransformer.transform(X,y)
         if doSave:
             df_toSave = pd.concat([X_meta,y],axis=1)
             df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
