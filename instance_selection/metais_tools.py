@@ -61,6 +61,7 @@ def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = [
     :param return_meta: bool indicating the output should be returned or not. If True it returnes a list of tuples
     :return: empty list or a list of typles containing file name, metaatributes and labels
     """
+
     metaTransformer = ISMetaAttributesTransformer()
     out = []
 
