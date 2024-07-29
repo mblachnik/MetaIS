@@ -3,3 +3,5 @@ imbalanced-learn==0.12
 pandas==2.2
 matplotlib
 joblib
+pyyaml
+tqdm

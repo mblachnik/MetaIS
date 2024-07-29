@@ -3,6 +3,8 @@ import os
 from joblib import Parallel, delayed
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from tqdm import tqdm
+
 from instance_selection.metais import ISMetaAttributesTransformer
 
 def train(X,y, model=None):
@@ -29,26 +31,22 @@ def store(model,file = "/models/model.pickl"):
     with open(file, 'wb') as f:
         pickle.dump(model, f)
 
-def generateMetaForDataset(metaTransformer: ISMetaAttributesTransformer, dropColumns: list, dir, file, ext, doSave:bool):
-    print('start: ', file)
+def generateMetaForDataset(metaTransformer: ISMetaAttributesTransformer, dropColumns: list, dir: str, file: str, ext: str, doSave:bool, verbose:bool):
+    if verbose:
+        print(f"Generating meta-attributes for {(dir + os.sep + file)}")
     dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
-    #dfY = pd.read_csv(dir + os.sep  + file + "_proto"+ext,sep=";")
-    #dfY.rename(columns={"weight":"_weight_"}, inplace=True)
-    #df = pd.merge(dfX, dfY, on='id', how='outer')
     if dfX.isnull().any().any():
         raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
                             f"It is likely that {file} and {file}_proto do not match")
-    #dropColumns.append("_weight_")
     X = dfX.loc[:, [c for c in dfX.columns if c not in dropColumns]]
     y = dfX.loc[:, "LABEL"]
     X_meta = metaTransformer.transform(X,y)
     if doSave:
         df_toSave = pd.concat([X_meta,y],axis=1)
         df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
-    print('koniec: ', file)
     return X, y
 
-def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta:bool=False, metaTransformer:ISMetaAttributesTransformer = None):
+def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta:bool=False, verbose:bool=True):
     """
     Function takes input list of files and for each file it generates metaattributes. The elements of the list should be
     a tuple (directory_name, file_name, file_extension),
@@ -67,10 +65,10 @@ def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = [
     out = []
 
     if n_jobs > 1:
-        Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(generateMetaForDataset)(metaTransformer, dropColumns, dir, file, ext, doSave) for dir, file, ext in files)
+        Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(generateMetaForDataset)(metaTransformer, dropColumns, dir, file, ext, doSave, verbose) for dir, file, ext in tqdm(files))
     else:
-        for dir, file, ext in files:
-            X, y = generateMetaForDataset(metaTransformer, dropColumns, dir, file, ext, doSave)
+        for dir, file, ext in tqdm(files):
+            X, y = generateMetaForDataset(metaTransformer, dropColumns, dir, file, ext, doSave, verbose)
             if return_meta:
                 out.append((file,X,y))
 

@@ -1,26 +1,13 @@
 import pickle
 import statistics
-
 import pandas as pd
 import numpy as np
 import numpy as np
-
-from scipy import sparse
-from sklearn.base import clone, BaseEstimator, TransformerMixin
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import LabelEncoder
-from imblearn.utils import Substitution
-from imblearn.utils._docstring import _random_state_docstring
-from imblearn.utils._param_validation import HasMethods, StrOptions
+from sklearn.base import BaseEstimator, TransformerMixin
+from imblearn.utils._param_validation import HasMethods
 from imblearn.under_sampling.base import BaseUnderSampler
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics.pairwise import euclidean_distances
-
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
-
-
-
-VOTING_KIND = ("auto", "hard", "soft")
 
 class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     """
@@ -28,8 +15,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     The meta-attributes should represent average distance to its neighbors,
     average distance to its nearest enemy or nearest neighbor to the same class
     """
-    def __init__(self, columns=None, k_values=[3,5,9,15,23,33]):
-        self.columns = columns
+    def __init__(self, k_values=[3,5,9,15,23,33]):
         self.metaAttributTransformers = [MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
         self.k_values = k_values
         for mat in self.k_values:
@@ -44,6 +30,8 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
+        if type(X) is pd.DataFrame:
+            X = X.values
         data_len = len(X)
         max_k = max(self.k_values) + 1
         is_data_len_smaller_than_max_k = data_len < max_k
@@ -60,7 +48,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         arguments_count = X.shape[1]
         distances, indices = neigh.kneighbors(X, return_distance=True)
 
-        for index, row in X.iterrows():
+        for index, row in enumerate(X):
             sameRowFound = False
             anyClassDistances = []
             sameClassDistances = []
