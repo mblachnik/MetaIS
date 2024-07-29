@@ -12,4 +12,4 @@ files = [(r, f.replace(".csv",""), ".csv")
                 if f.endswith(".csv")
                     and not any(s in f for s in ["_proto","_meta"])]
 
-generateMetaForDatasets(files)
+generateMetaForDatasets(files)    
