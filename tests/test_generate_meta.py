@@ -11,22 +11,23 @@ files = [(r, f.replace(".csv",""), ".csv")
 
 generateMetaForDatasets(files)
 
-for dir, file, ext in files:
-    df_X = pd.read_csv(dir + os.sep + file + ext,sep=";")
-    df_meta = pd.read_csv(dir + os.sep  + file + "_meta"+ext,sep=";")
-    ids1 = df_X.loc[:, "id"] #Pobieramy oryginalne ID
-    ids2 = df_meta.loc[:, "id"] #Pobieramy ID wygenerowane w meta
-    ids1_len = len(ids1)
+df_test = pd.read_csv("tests/data/fu.dat_meta_test.csv",sep=";")
 
-    if ids1_len != len(ids2):
-        print('Porażka: niespójna wielkość danych')
-        sys.exit()
+test_data_len = len(df_test)
 
-    for i in range(ids1_len):
-        id1 = ids1[i]
-        id2 = ids2[i]
-        if ids1[i] != ids2[i]:
-            print(f'Porażka: w rekordzie o indeksie {i} oryginalne id to {ids1[i]} a wygenerowane w metadanych to {ids2[i]}')
+df_meta = pd.read_csv("tests/data/fu.dat_meta.csv",sep=";").head(test_data_len)
+
+cols = df_test.columns
+
+for index in range(test_data_len):
+    for col in cols:
+        generated_col = df_meta.iloc[index][col]
+        test_col = df_test.iloc[index][col]
+        if(abs(generated_col - test_col) > 0.00000000000001):
+            print("Kolumna: ", col)
+            print("Nr wiersza: ", index)
+            print("Wartość oczekiwana", test_col)
+            print("Wartość uzyskana", generated_col)
             sys.exit()
 
-print('Test zakończony pomyślnie')
+print("OK")

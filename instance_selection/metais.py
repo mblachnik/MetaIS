@@ -1,26 +1,13 @@
 import pickle
 import statistics
-
 import pandas as pd
 import numpy as np
 import numpy as np
-
-from scipy import sparse
-from sklearn.base import clone, BaseEstimator, TransformerMixin
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import LabelEncoder
-from imblearn.utils import Substitution
-from imblearn.utils._docstring import _random_state_docstring
-from imblearn.utils._param_validation import HasMethods, StrOptions
+from sklearn.base import BaseEstimator, TransformerMixin
+from imblearn.utils._param_validation import HasMethods
 from imblearn.under_sampling.base import BaseUnderSampler
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics.pairwise import euclidean_distances
-
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
-
-
-
-VOTING_KIND = ("auto", "hard", "soft")
 
 class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     """
@@ -28,12 +15,8 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     The meta-attributes should represent average distance to its neighbors,
     average distance to its nearest enemy or nearest neighbor to the same class
     """
-    def __init__(self, by=1, columns=None, k_values=[3,5,9,15,23,33]):
-        self.by = by
-        self.columns = columns
-        self.metaAttributTransformers = [
-            #MetaAttributesEnum.id.value,
-            MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
+    def __init__(self, k_values=[3,5,9,15,23,33]):
+        self.metaAttributTransformers = [MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
         self.k_values = k_values
         for mat in self.k_values:
             strMat = str(mat)
@@ -46,7 +29,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
-    def transform(self, X, y=None, ids=None):
+    def transform(self, X, y=None):
         if type(X) is pd.DataFrame:
             X = X.values
         data_len = len(X)
@@ -73,20 +56,19 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
             sameClassNeighborsCount = 0
             firstSameClassNeighborFound = False
             firstOppositeClassNeighborFound = False
-            #newX[MetaAttributesEnum.id.value].append(ids[index])
             neigh_indices = indices[index]
             neigh_distances = distances[index]
 
             for i in range(n):
-                id = neigh_indices[i]
+                neigh_index = neigh_indices[i]
                 if sameRowFound == False:
-                    if id == index:
+                    if neigh_index == index:
                         sameRowFound = True
                         continue
                     elif i == n - 1:
                         break
 
-                is_same_class = y[id] == y[index]
+                is_same_class = y[neigh_index] == y[index]
                 normalized_distance = neigh_distances[i]/arguments_count
                 anyClassDistances.append(normalized_distance)
                 if is_same_class:

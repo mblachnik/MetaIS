@@ -33,6 +33,7 @@ files = [(r, f.replace(".csv",""), ".csv")
 Xs, ys, fNames = loadMetaFromDatasets(files)
 #%%
 #The above function gets a list of X and y of metaattributes for given file, this allows us to combine only selected files and train metamodel only on selected files
+#ToDo Parallelize this loop
 for fN in tqdm(fNames): #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
     Xx = []
     yy = []

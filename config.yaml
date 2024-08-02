@@ -6,24 +6,24 @@ results_dir: "Y:\\MetaIS\\results\\CCIS\\" #Location where results of the calcul
 
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
-#            "abalone",
-#            "banana",
+ #           "abalone",
+ #           "banana",
 #          #"coil2000", #Dokładność 1NN mniejsza niż default
 #          #  "kr-vs-k", #Na tym zbiorze coś się sypie
 #            "letter",
 #            "magic",
-#            "marketing",
-#            "nursery",
-#            "optdigits",
-#            "page-blocks",
-#            "penbased",
+            "marketing",
+            "nursery",
+            "optdigits",
+            "page-blocks",
+#           "penbased",
             "phoneme",
-            "ring",
-            "satimage",
-            "shuttle",
-            "spambase",
-            "splice",
-            "texture",
-            #"thyroid", #Dokładność 1NN mniejsza niż default
-            "twonorm"
+#            "ring",
+#            "satimage",
+#     #       "shuttle",
+#            "spambase",
+#     #       "splice",
+#            "texture",
+#            #"thyroid", #Dokładność 1NN mniejsza niż default
+#            "twonorm"
 ]

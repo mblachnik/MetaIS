@@ -28,30 +28,33 @@ files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] i
 
 #%%
 ress = []
+thresholds = [0.3,0.5,0.7]
+for threshold in thresholds:
+    #ToDo Parallelize this loop
+    for dir_name, dat_name, dat_ext, dat in tqdm(files):
 
-for dir_name, dat_name, dat_ext, dat in tqdm(files):
+        X_train, y_train = tools.read_data(os.path.join(dir_name,
+                                                        dat_name+dat_ext))
+        X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
+                                                        dat_name.replace("tra", "tst")))
 
-    X_train, y_train = tools.read_data(os.path.join(dir_name,
-                                                    dat_name+dat_ext))
-    X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
-                                                    dat_name.replace("tra", "tst")))
+        model_path = os.path.join(config["models_dir"], f"model_{dat}.dat_meta.pickl")
+        model_meta = MetaIS(estimator_src=model_path, threshold=threshold)
 
-    model_path = os.path.join(config["models_dir"], f"model_{dat}.dat_meta.pickl")
-    model_meta = MetaIS(estimator_src=model_path, threshold=0.3)
+        Xp_train,yp_train = model_meta.fit_resample(X_train, y_train)
 
-    Xp_train,yp_train = model_meta.fit_resample(X_train, y_train)
-
-    model_mis = knn.KNeighborsClassifier(n_neighbors=1)
-    model_mis.fit(Xp_train, yp_train)
-    X_test = X_test[Xp_train.columns]
-    yp = model_mis.predict(X_test)
-    res = tools.score(yp,y_test)
-    res["name"] = dat
-    res = res | tools.scoreIS(X_train,Xp_train)
-    ress.append(res)
+        model_mis = knn.KNeighborsClassifier(n_neighbors=1)
+        model_mis.fit(Xp_train, yp_train)
+        X_test = X_test[Xp_train.columns]
+        yp = model_mis.predict(X_test)
+        res = tools.score(yp,y_test)
+        res["name"] = dat
+        res["threshold"] = threshold
+        res = res | tools.scoreIS(X_train,Xp_train)
+        ress.append(res)
 
 res_df = pd.DataFrame(ress)
-res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS.csv"))
+res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_v2.csv"))
 perf = res_df.groupby("name").aggregate(["mean","std"])
-perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg.csv"))
+perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg_v2.csv"))
 print(perf)

@@ -1,13 +1,11 @@
 import pickle
 import os
+from joblib import Parallel, delayed
 import pandas as pd
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 
 from instance_selection.metais import ISMetaAttributesTransformer
-
 
 def train(X,y, model=None):
     """
@@ -33,7 +31,26 @@ def store(model,file = "/models/model.pickl"):
     with open(file, 'wb') as f:
         pickle.dump(model, f)
 
-def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False, verbose=True):
+def generateMetaForDataset(metaTransformer: ISMetaAttributesTransformer, dropColumns: list, dir: str, file: str, ext: str, doSave:bool, verbose:bool):
+    if verbose:
+        print(f"Generating meta-attributes for {(dir + os.sep + file)}")
+    dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
+    dfY = pd.read_csv(dir + os.sep + file + "_proto" + ext, sep=";")
+    dfY.rename(columns={"weight": "_weight_"}, inplace=True)
+    df = pd.merge(dfX, dfY, on='id', how='outer')
+    if df.isnull().any().any():
+        raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
+                            f"It is likely that {file} and {file}_proto do not match")
+    X = df.loc[:, [c for c in df.columns if c not in dropColumns]]
+    y = df.loc[:, "LABEL"]
+    X_meta = metaTransformer.transform(X,y)
+    y_meta = df["_weight_"]
+    if doSave:
+        df_toSave = pd.concat([X_meta,y_meta],axis=1)
+        df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
+    return X_meta, y_meta
+
+def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta:bool=False, verbose:bool=True):
     """
     Function takes input list of files and for each file it generates metaattributes. The elements of the list should be
     a tuple (directory_name, file_name, file_extension),
@@ -50,27 +67,15 @@ def generateMetaForDatasets(files : list, dropColumns: list = ["LABEL","id"], do
     """
     metaTransformer = ISMetaAttributesTransformer()
     out = []
-    for dir, file, ext in tqdm(files):
-        if verbose:
-            print(f"Generating meta-attributes for {(dir + os.sep + file)}")
-        dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
-        dfY = pd.read_csv(dir + os.sep  + file + "_proto"+ext,sep=";")
-        dfY.rename(columns={"weight":"_weight_"}, inplace=True)
-        df = pd.merge(dfX, dfY, on='id', how='outer')
-        if df.isnull().any().any():
-            raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
-                             f"It is likely that {file} and {file}_proto do not match")
-        dropColumns.append("_weight_")
-        X = df.loc[:, [c for c in dfX.columns if c not in dropColumns]]
-        y = df.loc[:, "_weight_"]
-        ids = df.loc[:, "id"] #Pobieramy oryginalne ID
-        #X_meta = metaTransformer.fit_transform(X,y)
-        X_meta = metaTransformer.transform(X,y,ids)
-        if doSave:
-            df_toSave = pd.concat([X_meta,y],axis=1)
-            df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
-        if return_meta:
-            out.append((file,X,y))
+
+    if n_jobs > 1:
+        Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(generateMetaForDataset)(metaTransformer, dropColumns, dir, file, ext, doSave, verbose) for dir, file, ext in tqdm(files))
+    else:
+        for dir, file, ext in tqdm(files):
+            X, y = generateMetaForDataset(metaTransformer, dropColumns, dir, file, ext, doSave, verbose)
+            if return_meta:
+                out.append((file,X,y))
+
     return out
 
 
