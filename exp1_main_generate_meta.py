@@ -24,4 +24,4 @@ files = [(r, f.replace(".csv",""), ".csv")
                            not (("-5-" in f) or ("-10-" in f))
          )]
 #%%
-generateMetaForDatasets(files)
+generateMetaForDatasets(files,n_jobs=20)

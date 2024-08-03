@@ -6,4 +6,3 @@ models/*
 __pycache__/
 .idea/
 .vscode/
-tests/data/fu.dat_meta.csv

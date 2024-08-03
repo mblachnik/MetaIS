@@ -35,16 +35,20 @@ def generateMetaForDataset(metaTransformer: ISMetaAttributesTransformer, dropCol
     if verbose:
         print(f"Generating meta-attributes for {(dir + os.sep + file)}")
     dfX = pd.read_csv(dir + os.sep + file + ext,sep=";")
-    if dfX.isnull().any().any():
+    dfY = pd.read_csv(dir + os.sep + file + "_proto" + ext, sep=";")
+    dfY.rename(columns={"weight": "_weight_"}, inplace=True)
+    df = pd.merge(dfX, dfY, on='id', how='outer')
+    if df.isnull().any().any():
         raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
                             f"It is likely that {file} and {file}_proto do not match")
-    X = dfX.loc[:, [c for c in dfX.columns if c not in dropColumns]]
-    y = dfX.loc[:, "LABEL"]
+    X = df.loc[:, [c for c in df.columns if c not in dropColumns]]
+    y = df.loc[:, "LABEL"]
     X_meta = metaTransformer.transform(X,y)
+    y_meta = df["_weight_"]
     if doSave:
-        df_toSave = pd.concat([X_meta,y],axis=1)
+        df_toSave = pd.concat([X_meta,y_meta],axis=1)
         df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
-    return X, y
+    return X_meta, y_meta
 
 def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta:bool=False, verbose:bool=True):
     """
