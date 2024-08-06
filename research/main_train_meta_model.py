@@ -15,7 +15,7 @@ import os
 from tqdm import tqdm
 doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomijamy ten krok
 
-with open('config.yaml', 'r') as file:
+with open('../config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 #Tworzy listę toupli składającą się z katalogu, nazwy pliku i rozszerzenia przechodząc po podkatalogach katalogu data

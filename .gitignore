@@ -1,7 +1,7 @@
 Original*Datasets/
 Filtered by*/
 all_pictures/
-data/*
+samples/data/*
 models/*
 __pycache__/
 .idea/

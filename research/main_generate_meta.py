@@ -9,7 +9,7 @@ import os
 import yaml
 
 #%%
-with open('config.yaml', 'r') as file:
+with open('../config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 #Tworzy listę toupli składającą się z katalogu, nazwy pliku i rozszerzenia przechodząc po podkatalogach katalogu data
