@@ -13,9 +13,12 @@ import experiments.tools as tools
 from tqdm import tqdm
 #%%
 
+with open('../config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
 def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
     X_train, y_train = tools.read_data(os.path.join(dir_name,
-                                                    dat_name+dat_ext))
+                                                        dat_name+dat_ext))
     X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
                                                     dat_name.replace("tra", "tst")))
 
@@ -34,9 +37,6 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
     res = res | tools.scoreIS(X_train,Xp_train)
     return res
 
-with open('config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
-
 
 files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] if c in f))
          for r,ds,fs in os.walk(config["data_dir"])
@@ -52,7 +52,6 @@ files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] i
 ress = []
 thresholds = [0.3,0.5,0.7]
 n_jobs = config["n_jobs"]
-
 for threshold in thresholds:
     if n_jobs > 1:
         results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(applyFile)(dir_name, dat_name, dat_ext, dat) for dir_name, dat_name, dat_ext, dat in tqdm(files))
@@ -60,7 +59,7 @@ for threshold in thresholds:
     else:
         for dir_name, dat_name, dat_ext, dat in tqdm(files):
             ress.append(applyFile(dir_name, dat_name, dat_ext, dat))
-        
+
 res_df = pd.DataFrame(ress)
 res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_v2.csv"))
 perf = res_df.groupby("name").aggregate(["mean","std"])
