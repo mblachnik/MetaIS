@@ -5,6 +5,7 @@ In order to get meatfeatures run exp1_generate_meta.py
 """
 
 #%%
+from joblib import Parallel, delayed
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -17,6 +18,19 @@ doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomija
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
+
+def trainMeta(fNames, Xs, ys, fN, config):
+    Xx = []
+    yy = []
+    for Xt,yt,ft in zip(Xs,ys,fNames):
+        if ft == fN: continue
+        Xx.append(Xt)
+        yy.append(yt)
+    X = np.vstack(Xx) #Sklejenie części X
+    y = np.hstack(yy) #Sklejenie części y
+    model = train(X,y,model=RandomForestClassifier(n_jobs=5)) #Nauczenie meta modelu
+    models_dir = config["models_dir"]
+    store(model, file = f"{models_dir}/model_{fN}.pickl") #Zapisanie meta_modelu
 
 #Tworzy listę toupli składającą się z katalogu, nazwy pliku i rozszerzenia przechodząc po podkatalogach katalogu data
 #Spośród wybranych plików wybierane są te które zawierają  _meta i są ty[u .csv
@@ -31,18 +45,13 @@ files = [(r, f.replace(".csv",""), ".csv")
 #%%
 #Ładowanie plików i uruchomienie procesu uczenia meta-modelu
 Xs, ys, fNames = loadMetaFromDatasets(files)
+n_jobs = 2
 #%%
 #The above function gets a list of X and y of metaattributes for given file, this allows us to combine only selected files and train metamodel only on selected files
-#ToDo Parallelize this loop
-for fN in tqdm(fNames): #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
-    Xx = []
-    yy = []
-    for Xt,yt,ft in zip(Xs,ys,fNames):
-        if ft == fN: continue
-        Xx.append(Xt)
-        yy.append(yt)
-    X = np.vstack(Xx) #Sklejenie części X
-    y = np.hstack(yy) #Sklejenie części y
-    model = train(X,y,model=RandomForestClassifier(n_jobs=5)) #Nauczenie meta modelu
-    models_dir = config["models_dir"]
-    store(model, file = f"{models_dir}/model_{fN}.pickl") #Zapisanie meta_modelu
+
+
+if n_jobs > 1: #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
+    results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(trainMeta)(fNames, Xs, ys, fN, config) for fN in tqdm(fNames))
+else:
+    for fN in tqdm(fNames): 
+        trainMeta(fNames, Xs, ys, fN, config)
