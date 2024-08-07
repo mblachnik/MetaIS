@@ -51,7 +51,7 @@ files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] i
 #%%
 ress = []
 thresholds = [0.3,0.5,0.7]
-n_jobs = 1
+n_jobs = config["n_jobs"]
 
 for threshold in thresholds:
     if n_jobs > 1:

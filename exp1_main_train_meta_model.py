@@ -45,7 +45,7 @@ files = [(r, f.replace(".csv",""), ".csv")
 #%%
 #Ładowanie plików i uruchomienie procesu uczenia meta-modelu
 Xs, ys, fNames = loadMetaFromDatasets(files)
-n_jobs = 2
+n_jobs = config["n_jobs"]
 #%%
 #The above function gets a list of X and y of metaattributes for given file, this allows us to combine only selected files and train metamodel only on selected files
 
