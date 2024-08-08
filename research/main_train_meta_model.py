@@ -51,7 +51,7 @@ n_jobs = config["n_jobs"]
 
 
 if n_jobs > 1: #We iterate over files so that for each file a separate dataset of metaattributes will be created, but from the full list of Xs and ys we have to droop current file becouse for that file we will perform experiments.
-    results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(trainMeta)(fNames, Xs, ys, fN, config) for fN in tqdm(fNames))
+    Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(trainMeta)(fNames, Xs, ys, fN, config) for fN in tqdm(fNames))
 else:
     for fN in tqdm(fNames): 
         trainMeta(fNames, Xs, ys, fN, config)
