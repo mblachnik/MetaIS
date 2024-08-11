@@ -9,6 +9,35 @@ from imblearn.under_sampling.base import BaseUnderSampler
 from sklearn.neighbors import NearestNeighbors
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
 
+def normalizeDistanceAttributes(df, distanceAttributes=("meanDistanceAnyClass",
+                                                          "meanDistanceOppositeClass",
+                                                          "meanDistanceSameClass",
+                                                          "minDistanceSameClass",
+                                                          "minDistanceOppositeClass",
+                                                          "minDistanceAnyClass")):
+    """
+    The function is used to normalize the distribution of a single attribute. It subtracts median and divides by IQR.
+    Here we use median and IQR because distance based attributes usually have squed distribution, so that way it is safer
+    :param df: the dataset in dataframe format
+    :param distanceAttributes: elements of attribute names, this list or tuple is an element which must be contained by
+    a real attribute. It is used to simplify entering feature names, espacielly that ofthen we do it for multiple k which
+    is stored in feature name
+    :return: normalized dataset
+    """
+    cols = [c for c in df.columns for n in distanceAttributes if n in c]
+    for c in cols:
+        X = df.loc[:, c]
+        idx = X != -1
+        X = X[idx]
+        quantils_val = X.quantile([0.25, 0.5, 0.75])
+        norm_val = quantils_val.values[2] - quantils_val.values[0]
+        mean = quantils_val.values[1]
+        df.loc[idx, c] = (X - mean) / norm_val
+        df.loc[~idx, c] = -100  # -100 is a magic number it can be replaced by any other number it should indicate that
+        # the true value is missing
+    return df
+
+
 class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     """
     Class responsible for generating metaatributes from input data.
@@ -108,6 +137,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                         newX[metaParam].append(-1)
         
         result = pd.DataFrame.from_dict(newX)
+        result = normalizeDistanceAttributes(result)
         return result
 
 

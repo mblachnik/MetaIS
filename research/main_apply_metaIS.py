@@ -62,6 +62,7 @@ for threshold in thresholds:
 
 res_df = pd.DataFrame(ress)
 res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_v2.csv"))
-perf = res_df.groupby("name").aggregate(["mean","std"])
+perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
+perf.reset_index(inplace=True)
 perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg_v2.csv"))
 print(perf)

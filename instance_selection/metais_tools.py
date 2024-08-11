@@ -80,6 +80,20 @@ def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = [
 
     return out
 
+def __loadMetaFromDataset(file, dropColumns):
+    """
+    Loades single dataset fith metafeatures and returns a dataframe
+    :param file: file name to read
+    :param dropColumns: columns to be ignorred
+    :return: dataframe with loaded data
+    """
+    df = pd.read_csv(file, sep=";")
+    if df.isnull().any().any():
+        raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
+                         f"It is likely that {file} and {file}_proto do not match")
+    df = df.loc[:, [c for c in df.columns if c not in dropColumns]]
+    return df
+
 
 def loadMetaFromDatasets(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False):
     """
@@ -95,15 +109,28 @@ def loadMetaFromDatasets(files : list, dropColumns: list = ["LABEL","id"], doSav
     outY = []
     outFile = []
     for dir, file, ext in files:
-        df = pd.read_csv(dir + os.sep  + file + ext, sep=";")
-        if df.isnull().any().any():
-            raise ValueError(f"In {file} after mergeing with IS weights one of values os NAN but it shouldnt. \n"
-                             f"It is likely that {file} and {file}_proto do not match")
-        dropColumns.append("_weight_")
-        X = df.loc[:, [c for c in df.columns if c not in dropColumns]].values
+        df = __loadMetaFromDataset(dir + os.sep + file + ext,dropColumns)
+        X = df.loc[:, [c for c in df.columns if c!="_weight_"]].values
         y = df.loc[:, "_weight_"].values
         outX.append(X)
         outY.append(y)
         outFile.append(file)
     return outX, outY, outFile
 
+def loadMetaFromDatasets_df(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False):
+    """
+    Function takes input list of files and for each file it loads metaattributes, each meta_file is then loaded and its
+    values are deliver to the output as a topule of lists where the first element of a touple contains list of X part of the meta attributes,
+     the second element is a list of Y's of the meta attributes, and the third part is a list of file names.
+    ( list[X], list[y], list[file_names])
+    :param files: list of files
+    :param dropColumns: list of columns to drop -
+    :return: a typle of lists containing loaded data ready to be merged
+    """
+    outFile = []
+    dfs = []
+    for dir, file, ext in files:
+        df = __loadMetaFromDataset(dir + os.sep + file + ext,dropColumns)
+        dfs.append(df)
+        outFile.append(file)
+    return dfs, outFile
