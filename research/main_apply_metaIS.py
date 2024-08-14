@@ -13,7 +13,10 @@ import experiments.tools as tools
 from tqdm import tqdm
 #%%
 
-with open('../config.yaml', 'r') as file:
+config_file = "config.yaml"
+if not os.path.isfile(config_file):
+    config_file = "../config.yaml"
+with open(config_file, 'r') as file:
     config = yaml.safe_load(file)
 
 def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
@@ -21,7 +24,6 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
                                                         dat_name+dat_ext))
     X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
                                                     dat_name.replace("tra", "tst")))
-
     model_path = os.path.join(config["models_dir"], f"model_{dat}.dat_meta.pickl")
     model_meta = MetaIS(estimator_src=model_path, threshold=threshold)
 
@@ -50,7 +52,7 @@ files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] i
 
 #%%
 ress = []
-thresholds = [0.3,0.5,0.7]
+thresholds = config["treshholds"]
 n_jobs = config["n_jobs"]
 for threshold in thresholds:
     if n_jobs > 1:
@@ -61,8 +63,8 @@ for threshold in thresholds:
             ress.append(applyFile(dir_name, dat_name, dat_ext, dat))
 
 res_df = pd.DataFrame(ress)
-res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_v2.csv"))
+res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_%s.csv" % config["result_postfix"]))
 perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
 perf.reset_index(inplace=True)
-perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg_v2.csv"))
+perf.to_csv(os.path.join(config["results_dir"],"results_MetaIS_agg_%s.csv" % config["result_postfix"]))
 print(perf)
