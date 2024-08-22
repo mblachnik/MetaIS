@@ -16,7 +16,10 @@ import os
 from tqdm import tqdm
 doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomijamy ten krok
 
-with open('../config.yaml', 'r') as file:
+config_file = "config.yaml"
+if not os.path.isfile(config_file):
+    config_file = "../config.yaml"
+with open(config_file, 'r') as file:
     config = yaml.safe_load(file)
 
 def trainMeta(fNames, Xs, ys, fN, config):

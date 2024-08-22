@@ -74,6 +74,7 @@ def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = [
         out.extend(results)
     else:
         for dir, file, ext in tqdm(files):
+            print(f"Processing file: {file} in {dir}")
             X, y = generateMetaForDataset(metaTransformer, dropColumns, dir, file, ext, doSave, verbose)
             if return_meta:
                 out.append((file,X,y))

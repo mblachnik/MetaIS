@@ -19,10 +19,15 @@ if not os.path.isfile(config_file):
 with open(config_file, 'r') as file:
     config = yaml.safe_load(file)
 
-def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
+def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:float):
+    print(f"Starting: \n"
+          f"     Train:{os.path.join(dir_name,dat_name+dat_ext)} \n"
+          f"     Train:{os.path.join(config['test_data_dir'],dat,dat_name.replace('tra', 'tst'))} \n"
+          f"     Threshold:{threshold}"
+          )
     X_train, y_train = tools.read_data(os.path.join(dir_name,
                                                         dat_name+dat_ext))
-    X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
+    X_test, y_test = tools.read_data(os.path.join(config["test_data_dir"],dat,
                                                     dat_name.replace("tra", "tst")))
     model_path = os.path.join(config["models_dir"], f"model_{dat}.dat_meta.pickl")
     model_meta = MetaIS(estimator_src=model_path, threshold=threshold)
@@ -37,6 +42,11 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str):
     res["name"] = dat
     res["threshold"] = threshold
     res = res | tools.scoreIS(X_train,Xp_train)
+    print(f"Finished: \n"
+          f"     Train:{os.path.join(dir_name,dat_name+dat_ext)} \n"
+          f"     Train:{os.path.join(config['test_data_dir'],dat,dat_name.replace('tra', 'tst'))} \n"
+          f"     Threshold:{threshold}"
+          )
     return res
 
 
@@ -56,11 +66,11 @@ thresholds = config["treshholds"]
 n_jobs = config["n_jobs"]
 for threshold in thresholds:
     if n_jobs > 1:
-        results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(applyFile)(dir_name, dat_name, dat_ext, dat) for dir_name, dat_name, dat_ext, dat in tqdm(files))
+        results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(applyFile)(dir_name, dat_name, dat_ext, dat, threshold) for dir_name, dat_name, dat_ext, dat in files)
         ress.extend(results)
     else:
         for dir_name, dat_name, dat_ext, dat in tqdm(files):
-            ress.append(applyFile(dir_name, dat_name, dat_ext, dat))
+            ress.append(applyFile(dir_name, dat_name, dat_ext, dat, threshold))
 
 res_df = pd.DataFrame(ress)
 res_df.to_csv(os.path.join(config["results_dir"],"results_MetaIS_%s.csv" % config["result_postfix"]))

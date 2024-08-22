@@ -8,6 +8,7 @@ from imblearn.utils._param_validation import HasMethods
 from imblearn.under_sampling.base import BaseUnderSampler
 from sklearn.neighbors import NearestNeighbors
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
+import warnings
 
 def normalizeDistanceAttributes(df, distanceAttributes=("meanDistanceAnyClass",
                                                           "meanDistanceOppositeClass",
@@ -188,8 +189,12 @@ class MetaIS(BaseUnderSampler):
         if self._estimator is None:
             self._estimator = self._load_estimator()
         X_meta = self.meta_attributes_transformer.transform(X, y)
-        yp = self._estimator.predict_proba(X_meta)
-        ys = yp[:, 0] > self.threshold
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            yp = self._estimator.predict_proba(X_meta)
+        ys = yp[:, 0] < self.threshold
+        if not np.any(ys): #In case the threshold removes all samples keep at least one sample
+            ys[np.argmax(yp[:,0])] = True #The one with highest prob for negative class is keeped
         X_resampled = np.array(X[ys, :], dtype=X.dtype)
         y_resampled = np.array(y[ys], dtype=y.dtype)
         return X_resampled, y_resampled

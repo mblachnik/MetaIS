@@ -1,9 +1,9 @@
-data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by ICF\\"
+data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by HMEI\\"
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
 #data_dir: "Y:\\Datasets\\tmp\\"
-models_dir: "Y:\\MetaIS\\models\\ICF\\" #Location where models are sotred Note that it should be algorithm specific
-results_dir: "Y:\\MetaIS\\results\\ICF\\" #Location where results of the calculations are stored
-n_jobs: 10
+models_dir: "Y:\\MetaIS\\models\\HMEI\\" #Location where models are sotred Note that it should be algorithm specific
+results_dir: "Y:\\MetaIS\\results\\HMEI\\" #Location where results of the calculations are stored
+n_jobs: 30
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
             "abalone",
@@ -20,12 +20,13 @@ datasets: [
             "phoneme",
             "ring",
             "satimage",
-     #       "shuttle",
+            "shuttle",
             "spambase",
      #       "splice",
             "texture",
             #"thyroid", #Dokładność 1NN mniejsza niż default
             "twonorm"
 ]
-result_postfix: "v3"
+result_postfix: "v5"
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+#treshholds: [0.9,0.92,0.94,0.96,0.98]
