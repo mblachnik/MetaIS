@@ -32,14 +32,7 @@ for model in models:
     imp = model.feature_importances_
     std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
 
-    feature_names = [MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
-    for mat in [3,5,9,15,23,33]:
-        strMat = str(mat)
-        feature_names.append(MetaAttributesEnum.sameClassNeighbors(strMat))
-        feature_names.append(MetaAttributesEnum.oppositeClassNeighbors(strMat))
-        feature_names.append(MetaAttributesEnum.meanDistanceAnyClass(strMat))
-        feature_names.append(MetaAttributesEnum.meanDistanceSameClass(strMat))
-        feature_names.append(MetaAttributesEnum.meanDistanceOppositeClass(strMat))
+    feature_names = MetaAttributesEnum.generateColumns()
 
     forest_importances = pd.Series(imp, index=feature_names)
     fig, ax = plt.subplots()

@@ -46,15 +46,8 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     average distance to its nearest enemy or nearest neighbor to the same class
     """
     def __init__(self, k_values: list[int] = [3,5,9,15,23,33]):
-        self.metaAttributTransformers = [MetaAttributesEnum.minDistanceSameClass.value, MetaAttributesEnum.minDistanceOppositeClass.value, MetaAttributesEnum.minDistanceAnyClass.value]
+        self.metaAttributTransformers = MetaAttributesEnum.generateColumns(k_values)
         self.k_values = k_values
-        for mat in self.k_values:
-            strMat = str(mat)
-            self.metaAttributTransformers.append(MetaAttributesEnum.sameClassNeighbors(strMat))
-            self.metaAttributTransformers.append(MetaAttributesEnum.oppositeClassNeighbors(strMat))
-            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceAnyClass(strMat))
-            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceSameClass(strMat))
-            self.metaAttributTransformers.append(MetaAttributesEnum.meanDistanceOppositeClass(strMat))
 
     def fit(self, X, y=None):
         return self
