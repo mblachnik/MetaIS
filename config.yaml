@@ -1,6 +1,6 @@
-models : [#"HMEI", #,"Drop3","CCIS","ENN",
+models : ["HMEI", #,"Drop3","CCIS","ENN",
           #"Drop3Keel"
-           "ICF3Keel"
+           #"ICF3Keel"
 ]
 data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
@@ -10,23 +10,23 @@ results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations
 n_jobs: 50
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
-            "abalone",
-            "banana",
-            "letter",
-            "magic",
-            "marketing",
-            "nursery",
-            "optdigits",
-            "page-blocks",
-            "penbased",
-            "phoneme",
+            #"abalone",
+            #"banana",
+            #"letter",
+            #"magic",
+            #"marketing",
+            #"nursery",
+            #"optdigits",
+            #"page-blocks",
+            #"penbased",
+            #"phoneme",
             "ring",
-            "satimage",
-            "spambase",
-            "texture",
-            "twonorm",
-            "shuttle",
-            "electricity-normalized"
+            #"satimage",
+            #"spambase",
+            #"texture",
+            #"twonorm",
+            #"shuttle",
+            #"electricity-normalized"
 ]
 
 #"thyroid", #Dokładność 1NN mniejsza niż default

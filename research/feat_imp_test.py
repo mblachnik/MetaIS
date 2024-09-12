@@ -1,13 +1,19 @@
 #%%
+import os
 import pickle
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
+import yaml
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
 from instance_selection.metais import ISMetaAttributesTransformer
 from sklearn.ensemble import RandomForestClassifier
-path_model = "Y:\\MetaIS\\models\\HMEI\\"
-dat = "ring"
+
+config_file = "config.yaml"
+if not os.path.isfile(config_file):
+    config_file = "../config.yaml"
+with open(config_file, 'r') as file:
+    config = yaml.safe_load(file)
 
 #path_data = f"Y:\\Datasets\\MetaIS\\corrected\\Filtered by HMEI\\{dat}\\"
 
@@ -18,13 +24,13 @@ dat = "ring"
 #tr = ISMetaAttributesTransformer()
 #X_meta = tr.fit_transform(X,y)
 
-
-files=[f"model_{dat}.dat_meta"]
 models = []
-for f in files:
-    with open(path_model + f + ".pickl", 'rb') as f:
-        model = pickle.load(f)
-        models.append(model)
+for alg in config['models']:
+    for dataset in config['datasets']:
+        with open(f"{config['models_dir']}{alg}\\model_{dataset}.dat_meta.pickl", 'rb') as f:
+            model = pickle.load(f)
+            models.append(model)
+            
 
 #%%
 for model in models:
