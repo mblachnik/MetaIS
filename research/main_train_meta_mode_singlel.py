@@ -17,7 +17,7 @@ from tqdm import tqdm
 from sklearn.base import clone
 from imblearn.ensemble import BalancedRandomForestClassifier
 
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 
 #meta_model = RandomForestClassifier(n_jobs=5)
 meta_model = BalancedRandomForestClassifier(n_jobs=5)

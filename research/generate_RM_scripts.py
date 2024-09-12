@@ -1,4 +1,4 @@
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 
 config = loadConfig()
 

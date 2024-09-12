@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import matplotlib.colors as colors
 
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig, savePlotFig
 
 doSave = True
 config = loadConfig()
@@ -44,16 +44,12 @@ for i,ds in enumerate(datasets):
     if i % plots_per_image==plots_per_image-1:
         plt.legend()
         if doSave:
-            if not os.path.isdir(os.path.join(config['results_dir']+model,"figs")):
-                os.mkdir(os.path.join(config['results_dir']+model,"figs"))
-            plt.savefig(os.path.join(config['results_dir']+model,"figs", f"fig{i}.png"))
+            savePlotFig(config, model, f"fig{i}.png")
         plt.show()
 
 plt.legend()
 if doSave:
-    if not os.path.isdir(os.path.join(config['results_dir']+model,"figs")):
-        os.mkdir(os.path.join(config['results_dir']+model,"figs"))
-    plt.savefig(os.path.join(config['results_dir']+model,"figs", f"fig{i}.png"))
+    savePlotFig(config, model, f"fig{i}.png")
 plt.show()
 
 

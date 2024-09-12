@@ -11,7 +11,7 @@ import os
 import experiments.tools as tools
 from tqdm import tqdm
 
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 #%%
 
 config = loadConfig()

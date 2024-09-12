@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 from instance_selection.metais_tools import loadMetaFromDatasets_df
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 
 config = loadConfig()
 

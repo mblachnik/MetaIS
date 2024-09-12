@@ -11,10 +11,10 @@ n_jobs: 50
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
             #"abalone",
-            #"banana",
-            #"letter",
-            #"magic",
-            #"marketing",
+            "banana",
+            "letter",
+            "magic",
+            "marketing",
             #"nursery",
             #"optdigits",
             #"page-blocks",

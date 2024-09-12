@@ -5,7 +5,7 @@ import os
 import yaml
 
 from instance_selection.metais import MetaIS
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 
 
 def plot_cls(df):

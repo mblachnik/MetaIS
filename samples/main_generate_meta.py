@@ -2,7 +2,7 @@
 from instance_selection.metais_tools import generateMetaForDatasets
 import os
 
-from research.basics.config_loader import loadConfig
+from research.basics.utils import loadConfig
 
 config = loadConfig()
 
