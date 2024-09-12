@@ -8,6 +8,7 @@ from instance_selection.meta_attributes_enum import MetaAttributesEnum
 from research.basics.config_loader import loadConfig
 
 config = loadConfig()
+SHOW_STD = False
 
 #path_data = f"Y:\\Datasets\\MetaIS\\corrected\\Filtered by HMEI\\{dat}\\"
 
@@ -30,13 +31,17 @@ for alg in config['models']:
 for model in models:
     #model = RandomForestClassifier()
     imp = model.feature_importances_
-    std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
-
     feature_names = MetaAttributesEnum.generateColumns()
-
     forest_importances = pd.Series(imp, index=feature_names)
     fig, ax = plt.subplots()
-    forest_importances.plot.bar(yerr=std, ax=ax)
+
+    if(SHOW_STD):
+        std = np.std([tree.feature_importances_ for tree in model.estimators_], axis=0)
+        forest_importances.plot.bar(yerr=std, ax=ax)
+    else:
+        forest_importances.plot.bar(ax=ax)
+
+    forest_importances.plot.bar(ax=ax)
     ax.set_title("Feature importances using MDI")
     ax.set_ylabel("Mean decrease in impurity")
     fig.tight_layout()
