@@ -1,6 +1,7 @@
 import pickle
 import os
 from joblib import Parallel, delayed
+import numpy
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from tqdm import tqdm
@@ -47,7 +48,7 @@ def generateMetaForDataset(metaTransformer: ISMetaAttributesTransformer, dropCol
     y_meta = df["_weight_"]
     if doSave:
         df_toSave = pd.concat([X_meta,y_meta],axis=1)
-        df_toSave.to_csv(dir + os.sep  + file + "_meta" + ext,index=False, sep=";")
+        df_toSave.to_csv(dir + os.sep  + file + "_meta_test" + ext,index=False, sep=";")
     return X_meta, y_meta
 
 def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta:bool=False, verbose:bool=True):
@@ -109,13 +110,20 @@ def loadMetaFromDatasets(files : list, dropColumns: list = ["LABEL","id"], doSav
     outX = []
     outY = []
     outFile = []
+
     for dir, file, ext in files:
         df = __loadMetaFromDataset(dir + os.sep + file + ext,dropColumns)
         X = df.loc[:, [c for c in df.columns if c!="_weight_"]].values
         y = df.loc[:, "_weight_"].values
-        outX.append(X)
-        outY.append(y)
-        outFile.append(file)
+        try:
+            index = outFile.index(file)
+            outX[index] = numpy.concatenate((outX[index], X), axis=0)
+            outY[index] = numpy.concatenate((outY[index], y), axis=0)
+        except ValueError:
+            outX.append(X)
+            outY.append(y)
+            outFile.append(file)
+
     return outX, outY, outFile
 
 def loadMetaFromDatasets_df(files : list, dropColumns: list = ["LABEL","id"], doSave:bool = True, return_meta=False):

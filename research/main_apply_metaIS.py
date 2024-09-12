@@ -51,13 +51,14 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:fl
 
 
 files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] if c in f))
-         for r,ds,fs in os.walk(config["data_dir"])
-            for f in fs
-                if f.endswith(".csv")
-                    and any( True  if c in f else False for c in config['datasets'])
-                    and (not any(s in f for s in ["_proto","_meta"]))
-                    and ("-5-" in f)
-                    and ("tra." in f)
+         for alghorithm in config["algorithms"]
+            for r,ds,fs in os.walk(f'{config["data_dir"]}{alghorithm}\\')
+                for f in fs
+                    if f.endswith(".csv")
+                        and any( True  if c in f else False for c in config['datasets'])
+                        and (not any(s in f for s in ["_proto","_meta"]))
+                        and ("-5-" in f)
+                        and ("tra." in f)
          ]
 
 #%%
