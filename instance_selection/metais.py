@@ -192,7 +192,7 @@ class MetaIS(BaseUnderSampler):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             yp = self._estimator.predict_proba(X_meta)
-        ys = yp[:, 0] < self.threshold
+        ys = yp[:, 1] > self.threshold
         if not np.any(ys): #In case the threshold removes all samples keep at least one sample
             ys[np.argmax(yp[:,0])] = True #The one with highest prob for negative class is keeped
         X_resampled = np.array(X[ys, :], dtype=X.dtype)
