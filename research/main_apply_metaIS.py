@@ -7,17 +7,14 @@ from joblib import Parallel, delayed
 import pandas as pd
 from  instance_selection.metais import MetaIS
 import sklearn.neighbors as knn
-import yaml
 import os
 import experiments.tools as tools
 from tqdm import tqdm
+
+from research.basics.utils import loadConfig
 #%%
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:float, is_model : str):
     print(f"Starting: \n"

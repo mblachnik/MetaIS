@@ -1,10 +1,10 @@
 #%%
 from instance_selection.metais_tools import generateMetaForDatasets
 import os
-import yaml
 
-with open('config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
+from research.basics.utils import loadConfig
+
+config = loadConfig()
 
 #Tworzy listę toupli składającą się z katalogu, nazwy pliku i rozszerzenia przechodząc po podkatalogach katalogu data
 #Spośród wybranych plików wybierane są te które nie mają w nazwie _proto ani _meta

@@ -1,16 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import yaml
 import os
 import matplotlib.colors as colors
 
+from research.basics.utils import loadConfig, savePlotFig
+
 doSave = True
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 
 #%%
@@ -47,16 +44,12 @@ for i,ds in enumerate(datasets):
     if i % plots_per_image==plots_per_image-1:
         plt.legend()
         if doSave:
-            if not os.path.isdir(os.path.join(config['results_dir']+model,"figs")):
-                os.mkdir(os.path.join(config['results_dir']+model,"figs"))
-            plt.savefig(os.path.join(config['results_dir']+model,"figs", f"fig{i}.png"))
+            savePlotFig(config, model, f"fig{i}.png")
         plt.show()
 
 plt.legend()
 if doSave:
-    if not os.path.isdir(os.path.join(config['results_dir']+model,"figs")):
-        os.mkdir(os.path.join(config['results_dir']+model,"figs"))
-    plt.savefig(os.path.join(config['results_dir']+model,"figs", f"fig{i}.png"))
+    savePlotFig(config, model, f"fig{i}.png")
 plt.show()
 
 

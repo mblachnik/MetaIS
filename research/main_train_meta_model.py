@@ -6,26 +6,21 @@ In order to get meatfeatures run exp1_generate_meta.py
 
 #%%
 from joblib import Parallel, delayed
-import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.base import clone
 from instance_selection.metais_tools import loadMetaFromDatasets, train, store, generateMetaForDatasets
-import yaml
 import os
 from tqdm import tqdm
 from imblearn.ensemble import BalancedRandomForestClassifier
+
+from research.basics.utils import loadConfig
 
 #meta_model = RandomForestClassifier(n_jobs=5)
 meta_model = BalancedRandomForestClassifier(n_jobs=5)
 
 doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomijamy ten krok
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 def trainMeta(fNames, Xs, ys, fN, config,is_model,meta_model):
     Xx = []

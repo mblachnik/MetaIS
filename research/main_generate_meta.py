@@ -6,15 +6,12 @@ Note that it reads configuration from config.yaml so prepare that file before ru
 from instance_selection.metais_tools import generateMetaForDatasets
 
 import os
-import yaml
+
+from research.basics.utils import loadConfig
 
 #%%
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 #Tworzy listę toupli składającą się z katalogu, nazwy pliku i rozszerzenia przechodząc po podkatalogach katalogu data
 #Spośród wybranych plików wybierane są te które nie mają w nazwie _proto ani _meta
