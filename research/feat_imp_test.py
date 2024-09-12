@@ -1,19 +1,13 @@
 #%%
-import os
 import pickle
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
-import yaml
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
-from instance_selection.metais import ISMetaAttributesTransformer
-from sklearn.ensemble import RandomForestClassifier
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+from research.basics.config_loader import loadConfig
+
+config = loadConfig()
 
 #path_data = f"Y:\\Datasets\\MetaIS\\corrected\\Filtered by HMEI\\{dat}\\"
 

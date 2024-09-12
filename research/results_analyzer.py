@@ -1,16 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import yaml
 import os
 import matplotlib.colors as colors
 
+from research.basics.config_loader import loadConfig
+
 doSave = True
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 
 #%%

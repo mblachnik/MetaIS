@@ -2,20 +2,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import yaml
 import os
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
-from experiments.tools import hist_classification
-from instance_selection.metais_tools import loadMetaFromDatasets, loadMetaFromDatasets_df
+from instance_selection.metais_tools import loadMetaFromDatasets_df
+from research.basics.config_loader import loadConfig
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-    if not os.path.isfile(config_file):
-        config_file = "../../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 # config["datasets"]
 #

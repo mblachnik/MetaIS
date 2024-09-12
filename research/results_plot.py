@@ -5,6 +5,7 @@ import os
 import yaml
 
 from instance_selection.metais import MetaIS
+from research.basics.config_loader import loadConfig
 
 
 def plot_cls(df):
@@ -14,11 +15,7 @@ def plot_cls(df):
     plt.scatter(df.loc[~labPos, "At1"], df.loc[~labPos, "At2"])
     plt.show()
 
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 # data_dir
 # models_dir

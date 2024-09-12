@@ -4,16 +4,14 @@ Results are sotred the same way as with metaIS
 """
 
 import pandas as pd
-from  instance_selection.metais import MetaIS
 import sklearn.neighbors as knn
-import yaml
 import os
 import experiments.tools as tools
-from tqdm import tqdm
+
+from research.basics.config_loader import loadConfig
 #%%
 
-with open('../config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 for model in config["models"]:
     files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] if c in f))

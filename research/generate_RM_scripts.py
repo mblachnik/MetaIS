@@ -1,12 +1,6 @@
+from research.basics.config_loader import loadConfig
 
-import os
-import yaml
-
-config_file = "config.yaml"
-if not os.path.isfile(config_file):
-    config_file = "../config.yaml"
-with open(config_file, 'r') as file:
-    config = yaml.safe_load(file)
+config = loadConfig()
 
 models = [
     #'CCIS',
