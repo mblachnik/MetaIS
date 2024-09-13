@@ -15,3 +15,6 @@ def savePlotFig(config, alg: str, fig_name: str):
     if not os.path.isdir(figs_dir):
         os.mkdir(figs_dir)
     plt.savefig(os.path.join(figs_dir, fig_name))
+
+def getResultsFilePath(config, alg: str, agg: bool, meta: bool):
+    return os.path.join(config["results_dir"], alg, f"results_{'Meta' if meta else ''}IS_{'agg_' if agg else ''}{config['result_postfix']}.csv")
