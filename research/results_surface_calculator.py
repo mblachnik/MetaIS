@@ -17,7 +17,9 @@ for t in dfs:
         df_ref = t[1]
         df_tmp = df[(df['name']==ds).values]
         df_ref_tmp = df_ref[(df_ref['name']==ds).values]
-        print(df_tmp[('red_rate','mean')])
-        print(df_tmp[('acc','mean')])
-        print(df_ref_tmp[('red_rate', 'mean')])
-        print(df_ref_tmp[('acc', 'mean')])
+        print(ds)
+        powierzchniaWzorca = df_ref_tmp[('red_rate', 'mean')] * df_ref_tmp[('acc', 'mean')]
+        print(f"Powierzchnia wzorca {powierzchniaWzorca}")
+        
+        #print(df_tmp[('red_rate','mean')])
+        #print(df_tmp[('acc','mean')])
