@@ -1,4 +1,4 @@
-models : ["HMEI", #,"Drop3","CCIS","ENN",
+models : ["ICF" #,"Drop3","CCIS","ENN",
           #"Drop3Keel"
            #"ICF3Keel"
 ]
@@ -33,7 +33,8 @@ datasets: [
 #       "splice",
 #       "splice",
 
-result_postfix: "v11_large"
+result_postfix: "v5"
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]
+IS_result_postfix: "v5"

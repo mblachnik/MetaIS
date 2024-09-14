@@ -11,7 +11,7 @@ import os
 import experiments.tools as tools
 from tqdm import tqdm
 
-from research.basics.utils import loadConfig
+from research.basics.utils import getResultsFilePath, loadConfig
 #%%
 
 config = loadConfig()
@@ -70,8 +70,8 @@ for model in config["models"]:
                 ress.append(applyFile(dir_name, dat_name, dat_ext, dat, threshold, model))
 
     res_df = pd.DataFrame(ress)
-    res_df.to_csv(os.path.join(config["results_dir"], model, "results_MetaIS_%s.csv" % config["result_postfix"]))
+    res_df.to_csv(getResultsFilePath(config, model, False, True))
     perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
     perf.reset_index(inplace=True)
-    perf.to_csv(os.path.join(config["results_dir"], model, "results_MetaIS_agg_%s.csv" % config["result_postfix"]))
+    perf.to_csv(getResultsFilePath(config, model, True, True))
     print(perf)
