@@ -1,4 +1,4 @@
-models : ["ICF" #,"Drop3","CCIS","ENN",
+models : ["CCIS" #,"Drop3","CCIS","ENN",
           #"Drop3Keel"
            #"ICF3Keel"
 ]
@@ -11,15 +11,15 @@ n_jobs: 50
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
             #"abalone",
-            "banana",
-            "letter",
-            "magic",
-            "marketing",
+            #"banana",
+            #"letter",
+           #"magic",
+           # "marketing",
             #"nursery",
             #"optdigits",
             #"page-blocks",
             #"penbased",
-            #"phoneme",
+            "phoneme",
             "ring",
             #"satimage",
             #"spambase",
@@ -33,7 +33,7 @@ datasets: [
 #       "splice",
 #       "splice",
 
-result_postfix: "v5"
+result_postfix: "v11"
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]

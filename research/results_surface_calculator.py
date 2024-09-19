@@ -23,7 +23,7 @@ for t in dfs:
         df_tmp_acc = df_tmp[('acc','mean')].values
         df_ref_tmp = df_ref[(df_ref['name']==ds).values]
 
-        powierzchniaWzorca = (df_ref_tmp[('red_rate', 'mean')] * df_ref_tmp[('acc', 'mean')]).sum()
+        powierzchniaWzorca = df_ref_tmp[('red_rate', 'mean')].iloc[0] * df_ref_tmp[('acc', 'mean')].iloc[0]
         area = np.trapz(df_tmp_acc, x=df_tmp_red_rate)
         area += df_tmp_red_rate[0] * df_tmp_acc[0] #uwzględnienie w powierzchni pod krzywą prostokąta, którego krawędzie wzynacza oś x i oś y do pierwszego punktu pomiarowego
         results.append([ds, powierzchniaWzorca, area])
