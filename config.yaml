@@ -7,23 +7,23 @@ results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations
 n_jobs: 50
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
-            #"abalone",
-            #"banana",
-            #"letter",
-           #"magic",
-           # "marketing",
-            #"nursery",
-            #"optdigits",
-            #"page-blocks",
-            #"penbased",
+            "abalone",
+            "banana",
+            "letter",
+            "magic",
+            "marketing",
+            "nursery",
+            "optdigits",
+            "page-blocks",
+            "penbased",
             "phoneme",
             "ring",
-            #"satimage",
-            #"spambase",
-            #"texture",
-            #"twonorm",
-            #"shuttle",
-            #"electricity-normalized"
+            "satimage",
+            "spambase",
+            "texture",
+            "twonorm",
+            "shuttle",
+            "electricity-normalized"
 ]
 
 #"thyroid", #Dokładność 1NN mniejsza niż default
