@@ -20,20 +20,33 @@ for dataset in config['datasets']:
             dfs_dict[alg] = meta_df
         
         values = []
-        i = 1
-        directory = f'{config["data_dir"]}{alg}'
-        path = os.path.join(directory, f'execution_time_{dataset}-5-{i}tra.dat.log')
 
-        while os.path.exists(path):
+        directory = f'{config["data_dir"]}{alg}'
+
+        path = os.path.join(directory, f'execution_time_{dataset}.dat.log')
+
+        if os.path.exists(path):
             with open(path, 'r') as csvfile:
                 reader = csv.reader(csvfile, delimiter='\t')
                 for file_row in reader:
                     if file_row and not file_row[0].startswith('#'):
                         value = float(file_row[0])
                         values.append(value)
-                        break
-            i += 1
-            path = os.path.join(directory, f'execution_time_{dataset}-5-{i}tra.dat.log')
+                        break   
+
+        # i = 1
+        # path = os.path.join(directory, f'execution_time_{dataset}-5-{i}tra.dat.log')
+
+        # while os.path.exists(path):
+        #     with open(path, 'r') as csvfile:
+        #         reader = csv.reader(csvfile, delimiter='\t')
+        #         for file_row in reader:
+        #             if file_row and not file_row[0].startswith('#'):
+        #                 value = float(file_row[0])
+        #                 values.append(value)
+        #                 break
+        #     i += 1
+        #     path = os.path.join(directory, f'execution_time_{dataset}-5-{i}tra.dat.log')
 
         meta_df_tmp = meta_df[(meta_df['name']==dataset).values]
         meta_value = meta_df_tmp[('process_time','mean')].mean()

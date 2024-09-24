@@ -16,10 +16,13 @@ def savePlotFig(config, alg: str, fig_name: str):
         os.mkdir(figs_dir)
     plt.savefig(os.path.join(figs_dir, fig_name))
 
+def getResultsFilePathWithPostfix(config, alg: str, agg: bool, meta: bool, postfix: str):
+    return getBaseResultsFilePath(config, alg, f"results_{'Meta' if meta else ''}IS_{'agg_' if agg else ''}{postfix}.csv")
+
 def getResultsFilePaths(config, alg: str, agg: bool, meta: bool):
     files = []
     for postfix in (config['result_postfix'] if meta else config['IS_result_postfix']):
-        files.append(getBaseResultsFilePath(config, alg, f"results_{'Meta' if meta else ''}IS_{'agg_' if agg else ''}{postfix}.csv"))
+        files.append(getResultsFilePathWithPostfix(config, alg, agg, meta, postfix))
     return files
 
 def getResultsFilePath(config, alg: str, agg: bool, meta: bool):
