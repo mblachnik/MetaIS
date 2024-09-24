@@ -1,19 +1,20 @@
 import os
 import pandas as pd
 import numpy as np
-from research.basics.utils import getResultsFilePath, getResultsFilePaths, loadConfig
+from research.basics.utils import getResultsFilePath, getResultsFilePathWithPostfix, getResultsFilePaths, loadConfig
 
 config = loadConfig()
 LICZBA_POMIAROW = 5
 
 dfs = []
 datasets = set()
-thresholds = set()
+
+df_1NN = pd.read_csv(getResultsFilePathWithPostfix(config, '1NN', False, False, "v0"),header=0)
+datasets.update(df_1NN['name'].unique())
+
 
 for alg in config['models']:
     df = pd.read_csv(getResultsFilePath(config, alg, False, True),header=0)
-    datasets.update(df['name'].unique())
-    thresholds.update(df['threshold'].unique())
     df_ref = pd.DataFrame()
     ref_file_names = getResultsFilePaths(config, alg, False, False)
     for fileName in ref_file_names:
@@ -23,27 +24,35 @@ for alg in config['models']:
 
 
 results = []
+first_red_rate = 0.0
 
 for i,ds in enumerate(datasets):
     row = []
     for df, df_ref, alg in dfs:
         df_ref_tmp = df_ref[(df_ref['name']==ds).values]
-        df_ref_tmp['powierzchnia_wzorca'] = df_ref_tmp['acc'] * df_ref_tmp['red_rate']
-        IS_mean = df_ref_tmp['powierzchnia_wzorca'].mean()
-        IS_std = df_ref_tmp['powierzchnia_wzorca'].std()
+        curves_metaIS = []
+        curves_IS = []
+        df_tmp1 = df_1NN[(df_1NN['name']==ds).values]
+        df_tmp2 = df[(df['name']==ds).values]
 
-        curves = []
-        df_tmp = df[(df['name']==ds).values]
         for i in range(LICZBA_POMIAROW):
-            acc_values = df_tmp.groupby('threshold')['acc'].nth(i)
-            red_rate_values = df_tmp.groupby('threshold')['red_rate'].nth(i)
-            a = acc_values.iloc[0]
-            b = red_rate_values.iloc[0]
-            auc = np.trapz(acc_values, x=red_rate_values) + a * b
-            curves.append(auc)
+            acc_values = list()
+            first_acc = df_tmp1['acc'].iloc[i]
+            acc_values.append(first_acc)
+            acc_values.extend(df_tmp2.groupby('threshold')['acc'].nth(i))
+            red_rate_values = [first_red_rate]
+            red_rate_values.extend(df_tmp2.groupby('threshold')['red_rate'].nth(i))
+            auc = np.trapz(acc_values, x=red_rate_values)
+            curves_metaIS.append(auc)
+            acc_IS = df_ref_tmp['acc'].iloc[i]
+            red_rate_IS = df_ref_tmp['red_rate'].iloc[0]
+            auc = np.trapz([first_acc, acc_IS], x=[first_red_rate, red_rate_IS])
+            curves_IS.append(auc)
         
-        metaIS_mean = np.mean(curves)
-        metaIS_std = np.std(curves)
+        metaIS_mean = np.mean(curves_metaIS)
+        metaIS_std = np.std(curves_metaIS)
+        IS_mean = np.mean(curves_IS)
+        IS_std = np.std(curves_IS)
         row.extend([IS_mean, IS_std, metaIS_mean, metaIS_std])
     results.append(row)
 
