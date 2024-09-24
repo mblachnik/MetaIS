@@ -10,6 +10,7 @@ import sklearn.neighbors as knn
 import os
 import experiments.tools as tools
 from tqdm import tqdm
+import time
 
 from research.basics.utils import getResultsFilePath, loadConfig
 #%%
@@ -29,8 +30,13 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:fl
     model_path = os.path.join(config["models_dir"], is_model, f"model_{dat}.dat_meta.pickl")
     model_meta = MetaIS(estimator_src=model_path, threshold=threshold)
 
+    t1 = time.time()
+    t1p = time.process_time()
     Xp_train,yp_train = model_meta.fit_resample(X_train, y_train)
-
+    t2 = time.time()
+    t2p = time.process_time()
+    dt = t2-t1
+    dtp = t2p-t1p
     model_mis = knn.KNeighborsClassifier(n_neighbors=1)
     model_mis.fit(Xp_train, yp_train)
     X_test = X_test[Xp_train.columns]
@@ -39,6 +45,7 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:fl
     res["name"] = dat
     res["threshold"] = threshold
     res = res | tools.scoreIS(X_train,Xp_train)
+    res = res | {'time':dt, 'process_time':dtp}
     print(f"Finished: \n"
           f"     Train:{os.path.join(dir_name,dat_name+dat_ext)} \n"
           f"     Train:{os.path.join(config['test_data_dir'],dat,dat_name.replace('tra', 'tst'))} \n"

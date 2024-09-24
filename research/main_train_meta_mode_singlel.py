@@ -26,7 +26,7 @@ doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomija
 filesForWhichWeGenerateModel = ["ring"]
 config = loadConfig()
 
-def trainMeta(fNames, Xs, ys, fN, config, is_model, meta_model):
+def trainMeta(fNames, Xs, ys, fN, config, is_model, meta_model, do_cv=False):
     print(f"Processing {fN}")
     Xx = []
     yy = []
@@ -37,9 +37,10 @@ def trainMeta(fNames, Xs, ys, fN, config, is_model, meta_model):
     X = np.vstack(Xx) #Sklejenie części X
     y = np.hstack(yy) #Sklejenie części y
     model = train(X,y,model=meta_model) #Nauczenie meta modelu
+    cv_model = clone(meta_model)
     if config["do_models_cv"]:
         scores = cross_val_score(clone(model),X,y,n_jobs=5,cv=StratifiedKFold(n_splits=5,shuffle=True),scoring='balanced_accuracy')
-        print(f"Model score: {np.mean(scores)}")
+        print(f"Model score: {np.mean(scores)} {np.std(scores)}")
     models_dir = config["models_dir"] + is_model + "/"
     print(f"Storing model in {models_dir}")
     store(model, file = f"{models_dir}/model_{fN}.pickl") #Zapisanie meta_modelu
@@ -69,5 +70,5 @@ for model in config["models"]:
     else:
         ms=[]
         for fN in tqdm(filesForWhichWeGenerateModel):
-            m = trainMeta(fNames, Xs, ys, fN, config, model, meta_model)
+            m = trainMeta(fNames, Xs, ys, fN, config, model, meta_model, do_cv=True)
             ms.append(m)

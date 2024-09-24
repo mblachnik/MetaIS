@@ -6,7 +6,7 @@ from instance_selection.meta_attributes_enum import MetaAttributesEnum
 from research.basics.utils import loadConfig, savePlotFig
 
 config = loadConfig()
-SHOW_STD = True
+SHOW_STD = False
 
 models = []
 for dataset in config['datasets']:

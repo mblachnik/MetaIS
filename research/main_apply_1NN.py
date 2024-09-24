@@ -1,5 +1,5 @@
 """
-A script to perform classical IS based on the proto files.
+A script to perform simple 1NN prediction without any instance selection.
 Results are sotred the same way as with metaIS
 """
 
@@ -30,11 +30,16 @@ for model in config["models"]:
 
     for i,(dir_name, dat_name, dat_ext, dat) in  enumerate(files):
         print(f"{i}/{len(files)}")
-        Xp_train, yp_train, stats = tools.read_data_and_IS(os.path.join(dir_name,
+        if model not in ["1NN"]:
+            Xp_train, yp_train, stats = tools.read_data_and_IS(os.path.join(dir_name,
                                                         dat_name+dat_ext),
                                                   os.path.join(dir_name,
-                                                               dat_name + "_proto" + dat_ext)
+                                                               dat_name  + dat_ext)
                                                   )
+        else:
+            Xp_train, yp_train = tools.read_data(os.path.join(dir_name, dat_name + dat_ext))
+            stats = tools.scoreIS(Xp_train, Xp_train)
+
         X_test, y_test   = tools.read_data(os.path.join(config["test_data_dir"],dat,
                                                         dat_name.replace("tra", "tst")))
 
@@ -48,8 +53,9 @@ for model in config["models"]:
         ress.append(res)
 
     res_df = pd.DataFrame(ress)
-    res_df.to_csv(os.path.join(config["results_dir"]+model,"results_IS_v2.csv"))
+    post_fix="_v5"
+    res_df.to_csv(os.path.join(config["results_dir"]+model,f"results_IS{post_fix}.csv"))
     perf = res_df.groupby("name").aggregate(["mean","std"])
-    perf.to_csv(os.path.join(config["results_dir"]+model,"results_IS_agg_v2.csv"))
+    perf.to_csv(os.path.join(config["results_dir"]+model,f"results_IS_agg{post_fix}.csv"))
     print(perf)
 

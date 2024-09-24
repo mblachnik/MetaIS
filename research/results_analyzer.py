@@ -17,7 +17,7 @@ results_files = ["results_MetaIS_agg_v11_large.csv",
 #"results_MetaIS_agg_v_xxx1.csv"
                ]
 
-model = "Drop3Keel"
+model = "ICFKeel"
 dfs = []
 for file in results_files:
     df = pd.read_csv(os.path.join(config["results_dir"] + model,file),header=[0,1])

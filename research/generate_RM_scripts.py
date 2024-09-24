@@ -7,12 +7,12 @@ models = [
     #'HMNE',
     #'ENN',
     #'Drop3'
-    #'Drop3Keel'
-    'ICFKeel'
+    'Drop3Keel'
+    #'ICFKeel'
     ]
-folds = [0,1,2,3,4,5]
-datasets = ['ring']
-datasets = config['datasets']
+folds = [0]#,1,2,3,4,5]
+datasets = ['shuttle']
+#datasets = config['datasets']
 res = []
 for dataset in datasets:
     for model in models:
