@@ -1,10 +1,10 @@
 models : [
-#          "HMEI",
-#          "CCIS",
-#          "ENN",
-#          "Drop3Keel",
-#          "ICFKeel",
-          "1NN"
+          "HMEI",
+          "CCIS",
+          "ENN",
+          "Drop3Keel",
+          "ICFKeel",
+#          "1NN"
 ]
 data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
