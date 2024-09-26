@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import matplotlib.colors as colors
+from scipy.interpolate import interp1d
 
 from research.basics.utils import loadConfig, savePlotFig
 
@@ -38,7 +39,25 @@ plt.axvline(0, color='black',linewidth=1)
 
 plt.fill_between(X, Y, color='white', edgecolor=meta_color, hatch='//', alpha=0.5)
 plt.fill_between(X_REF, Y_REF, color='white', edgecolor=ref_color, hatch='\\\\',alpha=0.5)
+plt.show()
 
+interp_func = interp1d(X, Y, kind='linear', fill_value='extrapolate')
+x_target = X_REF.iloc[1]
+y_target = interp_func(x_target)
+X_filtered = X.clip(upper=x_target)
+Y_filtered = Y.head(len(X_filtered))
+X_filtered.iloc[-1] = x_target
+Y_filtered.iloc[-1] = y_target
+
+
+plt.plot(X,Y,color=meta_color,label=ds,marker='*')
+plt.plot(X_REF, Y_REF,color=ref_color,marker='o')
+
+plt.axhline(0, color='black',linewidth=1)
+plt.axvline(0, color='black',linewidth=1)
+
+plt.fill_between(X_filtered, Y_filtered, color='white', edgecolor=meta_color, hatch='//', alpha=0.5)
+plt.fill_between(X_REF, Y_REF, color='white', edgecolor=ref_color, hatch='\\\\',alpha=0.5)
 plt.show()
 
 
