@@ -10,12 +10,13 @@ from sklearn.neighbors import NearestNeighbors
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
 import warnings
 
+
 def normalizeDistanceAttributes(df, distanceAttributes=("meanDistanceAnyClass",
-                                                          "meanDistanceOppositeClass",
-                                                          "meanDistanceSameClass",
-                                                          "minDistanceSameClass",
-                                                          "minDistanceOppositeClass",
-                                                          "minDistanceAnyClass")):
+                                                        "meanDistanceOppositeClass",
+                                                        "meanDistanceSameClass",
+                                                        "minDistanceSameClass",
+                                                        "minDistanceOppositeClass",
+                                                        "minDistanceAnyClass")):
     """
     The function is used to normalize the distribution of a single attribute. It subtracts median and divides by IQR.
     Here we use median and IQR because distance based attributes usually have squed distribution, so that way it is safer
@@ -45,7 +46,8 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
     The meta-attributes should represent average distance to its neighbors,
     average distance to its nearest enemy or nearest neighbor to the same class
     """
-    def __init__(self, k_values: list[int] = [3,5,9,15,23,33]):
+
+    def __init__(self, k_values: list[int] = [3, 5, 9, 15, 23, 33]):
         self.metaAttributTransformers = MetaAttributesEnum.generateColumns(k_values)
         self.k_values = k_values
 
@@ -60,14 +62,14 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
         is_data_len_smaller_than_max_k = data_len < max_k
 
         n = data_len if is_data_len_smaller_than_max_k else max_k
-        neigh = NearestNeighbors(n_neighbors=n, metric="sqeuclidean") 
-        neigh.fit(X,y)
+        neigh = NearestNeighbors(n_neighbors=n, metric="sqeuclidean")
+        neigh.fit(X, y)
 
         newX = dict()
 
         for metaParam in self.metaAttributTransformers:
             newX[metaParam] = []
-        
+
         arguments_count = X.shape[1]
         distances, indices = neigh.kneighbors(X, return_distance=True)
 
@@ -92,7 +94,7 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                         break
 
                 is_same_class = y[neigh_index] == y[index]
-                normalized_distance = neigh_distances[i]/arguments_count
+                normalized_distance = neigh_distances[i] / arguments_count
                 anyClassDistances.append(normalized_distance)
                 if is_same_class:
                     sameClassNeighborsCount += 1
@@ -109,27 +111,29 @@ class ISMetaAttributesTransformer(BaseEstimator, TransformerMixin):
                         if firstSameClassNeighborFound == False:
                             newX[MetaAttributesEnum.minDistanceAnyClass.value].append(normalized_distance)
                         firstOppositeClassNeighborFound = True
-                        
+
                 current_k = i if sameRowFound else i + 1
                 if current_k in self.k_values:
                     strK = str(current_k)
                     newX[MetaAttributesEnum.sameClassNeighbors(strK)].append(sameClassNeighborsCount)
                     newX[MetaAttributesEnum.oppositeClassNeighbors(strK)].append(current_k - sameClassNeighborsCount)
                     newX[MetaAttributesEnum.meanDistanceAnyClass(strK)].append(statistics.mean(anyClassDistances))
-                    newX[MetaAttributesEnum.meanDistanceOppositeClass(strK)].append(statistics.mean(oppositeClassDistances) if firstOppositeClassNeighborFound else -1)
-                    newX[MetaAttributesEnum.meanDistanceSameClass(strK)].append(statistics.mean(sameClassDistances) if firstSameClassNeighborFound else -1)
+                    newX[MetaAttributesEnum.meanDistanceOppositeClass(strK)].append(
+                        statistics.mean(oppositeClassDistances) if firstOppositeClassNeighborFound else -1)
+                    newX[MetaAttributesEnum.meanDistanceSameClass(strK)].append(
+                        statistics.mean(sameClassDistances) if firstSameClassNeighborFound else -1)
 
             if firstSameClassNeighborFound == False:
                 newX[MetaAttributesEnum.minDistanceSameClass.value].append(-1)
             elif firstOppositeClassNeighborFound == False:
                 newX[MetaAttributesEnum.minDistanceOppositeClass.value].append(-1)
 
-        if(is_data_len_smaller_than_max_k):
+        if (is_data_len_smaller_than_max_k):
             for metaParam in self.metaAttributTransformers:
-                if(len(newX[metaParam]) == 0):
+                if (len(newX[metaParam]) == 0):
                     for i in range(n):
                         newX[metaParam].append(-1)
-        
+
         result = pd.DataFrame.from_dict(newX)
         result = normalizeDistanceAttributes(result)
         return result
@@ -147,7 +151,8 @@ class MetaIS(BaseUnderSampler):
             *,
             sampling_strategy="auto",
             estimator_src: str = "models/model.pickl",
-            threshold: float =0.7,
+            threshold: float = 0.7,
+            keep_proba: bool = False,
             meta_attributes_transformer=ISMetaAttributesTransformer()
     ):
         super().__init__(sampling_strategy=sampling_strategy)
@@ -155,6 +160,8 @@ class MetaIS(BaseUnderSampler):
         self.estimator_src: str = estimator_src
         self.meta_attributes_transformer = meta_attributes_transformer
         self._estimator = None
+        self.keep_proba = keep_proba
+        self._y_proba_ = None
 
     def _load_estimator(self):
         """
@@ -164,9 +171,17 @@ class MetaIS(BaseUnderSampler):
         :return:
         """
         with open(self.estimator_src, 'rb') as f:
-             model = pickle.load(f)
-             self._estimator = model
+            model = pickle.load(f)
+            self._estimator = model
         return model
+
+    def __resample(self, X, y, yp):
+        ys = yp[:, 1] > self.threshold
+        if not np.any(ys):  # In case the threshold removes all samples keep at least one sample
+            ys[np.argmax(yp[:, 0])] = True  # The one with highest prob for negative class is keeped
+        X_resampled = np.array(X[ys, :], dtype=X.dtype)
+        y_resampled = np.array(y[ys], dtype=y.dtype)
+        return X_resampled, y_resampled
 
     def _fit_resample(self, X, y):
         """
@@ -185,14 +200,13 @@ class MetaIS(BaseUnderSampler):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             yp = self._estimator.predict_proba(X_meta)
-        ys = yp[:, 1] > self.threshold
-        if not np.any(ys): #In case the threshold removes all samples keep at least one sample
-            ys[np.argmax(yp[:,0])] = True #The one with highest prob for negative class is keeped
-        X_resampled = np.array(X[ys, :], dtype=X.dtype)
-        y_resampled = np.array(y[ys], dtype=y.dtype)
-        return X_resampled, y_resampled
+            if self.keep_proba:
+                self._y_proba_ = yp
 
+        return self.__resample(X, y, yp)
 
-
-
-
+    def resample_with_new_threshold(self, X, y, threshold:float):
+        if (not self.keep_proba) or (self._y_proba_ is None):
+            raise Exception("First you need to execute fit_resample with keep_proba set to true")
+        self.threshold = threshold
+        return self.__resample(X, y, self._y_proba_)

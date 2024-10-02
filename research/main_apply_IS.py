@@ -48,8 +48,8 @@ for model in config["models"]:
         ress.append(res)
 
     res_df = pd.DataFrame(ress)
-    res_df.to_csv(os.path.join(config["results_dir"]+model,"results_IS_v2.csv"))
+    res_df.to_csv(os.path.join(config["results_dir"]+model,"results_IS_vX.csv"))
     perf = res_df.groupby("name").aggregate(["mean","std"])
-    perf.to_csv(os.path.join(config["results_dir"]+model,"results_IS_agg_v2.csv"))
+    perf.to_csv(os.path.join(config["results_dir"]+model,"results_IS_agg_vX.csv"))
     print(perf)
 
