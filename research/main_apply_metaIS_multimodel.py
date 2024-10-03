@@ -55,32 +55,32 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:fl
           )
     return res
 
-for model in config["models"]:
-    files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] if c in f))
-             for r,ds,fs in os.walk(config["data_dir"] + model + "/")
-                for f in fs
-                    if f.endswith(".csv")
-                        and any( True  if c in f else False for c in config['datasets'])
-                        and (not any(s in f for s in ["_proto","_meta"]))
-                        and ("-5-" in f)
-                        and ("tra." in f)
-             ]
+model = config["models"][0]
+files = [(r, f.replace(".csv",""), ".csv", next(c  for c in config['datasets'] if c in f))
+            for r,ds,fs in os.walk(config["data_dir"] + model + "/")
+            for f in fs
+                if f.endswith(".csv")
+                    and any( True  if c in f else False for c in config['datasets'])
+                    and (not any(s in f for s in ["_proto","_meta"]))
+                    and ("-5-" in f)
+                    and ("tra." in f)
+            ]
 
     #%%
-    ress = []
-    thresholds = config["treshholds"]
-    n_jobs = config["n_jobs"]
-    for threshold in thresholds:
-        if n_jobs > 1:
-            results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(applyFile)(dir_name, dat_name, dat_ext, dat, threshold) for dir_name, dat_name, dat_ext, dat in files)
-            ress.extend(results)
-        else:
-            for dir_name, dat_name, dat_ext, dat in tqdm(files):
-                ress.append(applyFile(dir_name, dat_name, dat_ext, dat, threshold))
+ress = []
+thresholds = config["treshholds"]
+n_jobs = config["n_jobs"]
+for threshold in thresholds:
+    if n_jobs > 1:
+        results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(applyFile)(dir_name, dat_name, dat_ext, dat, threshold) for dir_name, dat_name, dat_ext, dat in files)
+        ress.extend(results)
+    else:
+        for dir_name, dat_name, dat_ext, dat in tqdm(files):
+            ress.append(applyFile(dir_name, dat_name, dat_ext, dat, threshold))
 
-    res_df = pd.DataFrame(ress)
-    res_df.to_csv(getResultsFilePath(config, model, False, True))
-    perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
-    perf.reset_index(inplace=True)
-    perf.to_csv(getResultsFilePath(config, model, True, True))
-    print(perf)
+res_df = pd.DataFrame(ress)
+res_df.to_csv(getResultsFilePath(config, "multimodel", False, True))
+perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
+perf.reset_index(inplace=True)
+perf.to_csv(getResultsFilePath(config, "multimodel", True, True))
+print(perf)

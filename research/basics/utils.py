@@ -32,4 +32,7 @@ def getSurfacesResultsFilePath(config, alg: str):
     return getBaseResultsFilePath(config, alg, f"results_surfaces_{config['result_postfix']}.csv")
 
 def getBaseResultsFilePath(config, alg: str, filename: str):
-    return os.path.join(config["results_dir"], alg, filename)
+    dir = os.path.join(config["results_dir"], alg)
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+    return os.path.join(dir, filename)
