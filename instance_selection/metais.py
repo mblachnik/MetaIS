@@ -1,5 +1,6 @@
 import pickle
 import statistics
+from typing import List, Union
 import pandas as pd
 import numpy as np
 import numpy as np
@@ -150,16 +151,16 @@ class MetaIS(BaseUnderSampler):
             self,
             *,
             sampling_strategy="auto",
-            estimator_src: str = "models/model.pickl",
+            estimator_src: Union[str, List[str]] = ["models/model.pickl"],
             threshold: float = 0.7,
             keep_proba: bool = False,
             meta_attributes_transformer=ISMetaAttributesTransformer()
     ):
         super().__init__(sampling_strategy=sampling_strategy)
         self.threshold = threshold
-        self.estimator_src: str = estimator_src
+        self.estimator_src: list[str] = [estimator_src] if isinstance(estimator_src, str) else estimator_src
         self.meta_attributes_transformer = meta_attributes_transformer
-        self._estimator = None
+        self._estimators = None
         self.keep_proba = keep_proba
         self._y_proba_ = None
 
@@ -170,10 +171,11 @@ class MetaIS(BaseUnderSampler):
         overload this function
         :return:
         """
-        with open(self.estimator_src, 'rb') as f:
-            model = pickle.load(f)
-            self._estimator = model
-        return model
+        models = []
+        for src in self.estimator_src:
+            with open(src, 'rb') as f:
+                models.append(pickle.load(f))
+        return models
 
     def __resample(self, X, y, yp):
         ys = yp[:, 1] > self.threshold
@@ -194,12 +196,18 @@ class MetaIS(BaseUnderSampler):
         :param y:
         :return:
         """
-        if self._estimator is None:
-            self._estimator = self._load_estimator()
+        if self._estimators is None:
+            self._estimators = self._load_estimator()
         X_meta = self.meta_attributes_transformer.transform(X, y)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            yp = self._estimator.predict_proba(X_meta)
+            yps = []
+            for estimator in self._estimators:
+                temp = estimator.predict_proba(X_meta)
+                yps.append(temp)
+            
+            yps_np = np.array(yps)
+            yp = np.mean(yps_np, axis=0)
             if self.keep_proba:
                 self._y_proba_ = yp
 
