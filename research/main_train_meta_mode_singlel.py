@@ -23,7 +23,9 @@ from research.basics.utils import loadConfig
 meta_model = BalancedRandomForestClassifier(n_jobs=5)
 doGenerateMeta = False #Jak true to generujemy metaatrybuty, jak False to pomijamy ten krok
 
-filesForWhichWeGenerateModel = ["php89ntbG"]
+filesForWhichWeGenerateModel = ["php89ntbG",
+            "covtype",
+            "codrnaNorm",]
 config = loadConfig()
 
 def trainMeta(fNames, Xs, ys, fN, config, is_model, meta_model, do_cv=False):

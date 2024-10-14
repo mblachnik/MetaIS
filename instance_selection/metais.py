@@ -181,6 +181,8 @@ class MetaIS(BaseUnderSampler):
         ys = yp[:, 1] > self.threshold
         if not np.any(ys):  # In case the threshold removes all samples keep at least one sample
             ys[np.argmax(yp[:, 0])] = True  # The one with highest prob for negative class is keeped
+        if type(X) is pd.DataFrame:
+            X = X.values
         X_resampled = np.array(X[ys, :], dtype=X.dtype)
         y_resampled = np.array(y[ys], dtype=y.dtype)
         return X_resampled, y_resampled

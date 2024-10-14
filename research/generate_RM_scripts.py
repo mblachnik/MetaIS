@@ -5,17 +5,17 @@ config = loadConfig()
 models = [
     #'CCIS',
     #'HMNE',
-    'ENN',
+    #'ENN',
     #'Drop3'
     #'Drop3Keel',
-    #'ICFKeel'
+    'ICFKeel'
     ]
 folds = [#0,
          1,2,3,4,5]
 datasets = [
-    #"php89ntbG",
+    "php89ntbG",
             #"covtype",#
-            "codrnaNorm"
+            #"codrnaNorm"
 ]
 #datasets = config['datasets']
 res = []

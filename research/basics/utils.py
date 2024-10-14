@@ -19,14 +19,14 @@ def savePlotFig(config, alg: str, fig_name: str):
 def getResultsFilePathWithPostfix(config, alg: str, agg: bool, meta: bool, postfix: str):
     return getBaseResultsFilePath(config, alg, f"results_{'Meta' if meta else ''}IS_{'agg_' if agg else ''}{postfix}.csv")
 
-def getResultsFilePaths(config, alg: str, agg: bool, meta: bool):
+def getResultsFilePaths(config, alg: str, agg: bool, meta: bool, extras:str=""):
     files = []
     for postfix in (config['result_postfix'] if meta else config['IS_result_postfix']):
-        files.append(getResultsFilePathWithPostfix(config, alg, agg, meta, postfix))
+        files.append(getResultsFilePathWithPostfix(config, alg, agg, meta, postfix + extras))
     return files
 
-def getResultsFilePath(config, alg: str, agg: bool, meta: bool):
-    return getResultsFilePaths(config, alg, agg, meta)[0]
+def getResultsFilePath(config, alg: str, agg: bool, meta: bool, extras:str=""):
+    return getResultsFilePaths(config, alg, agg, meta, extras)[0]
 
 def getSurfacesResultsFilePath(config, alg: str):
     return getBaseResultsFilePath(config, alg, f"results_surfaces_{config['result_postfix']}.csv")

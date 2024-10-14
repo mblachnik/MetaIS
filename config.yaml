@@ -1,11 +1,21 @@
 models : [
-          "HMEI",
-          "CCIS",
+ #         "HMEI",
           "ENN",
           "Drop3Keel",
           "ICFKeel",
+          "CCIS",
+          #'multimodel'
 #          "1NN"
 ]
+
+models_names : {
+    "HMEI":"HMN-EI",
+    "CCIS":"CCIS",
+    "ENN":"ENN",
+    "Drop3Keel":"Drop3",
+    "ICFKeel":"ICF",
+    "multimodel":"Meta model"
+}
 data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
 #data_dir: "Y:\\Datasets\\tmp\\"
@@ -14,30 +24,33 @@ results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations
 n_jobs: 5
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
-            "abalone",
-            "banana",
-            "letter",
-            "magic",
-            "marketing",
-            "nursery",
-            "optdigits",
-            "page-blocks",
-            "penbased",
-            "phoneme",
-            "ring",
-            "satimage",
-            "spambase",
-            "texture",
-            "twonorm",
-            "shuttle",
-            "electricity-normalized"
+            "php89ntbG",
+            "covtype",
+            "codrnaNorm",
+#            "abalone",
+#           "banana",
+#            "letter",
+#            "magic",
+#            "marketing",
+#            "nursery",
+#            "optdigits",
+#            "page-blocks",
+#            "penbased",
+#            "phoneme",
+#            "ring",
+#            "satimage",
+#            "spambase",
+#            "texture",
+#            "twonorm",
+#            "shuttle",
+#            "electricity-normalized"
 ]
 
 #"thyroid", #Dokładność 1NN mniejsza niż default
 #       "splice",
 #       "splice",
 
-result_postfix: ["v12_large"]
+result_postfix: ["v13_large"]
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]

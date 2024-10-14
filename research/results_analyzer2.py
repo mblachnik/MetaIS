@@ -42,7 +42,7 @@ for model in config["models"]:
 #%%
 df = next(iter(models_dict.values()))
 datasets = np.unique(df['name'])
-cols = ['r','g','b', 'y', 'k']
+cols = ['r','g','b', 'y', 'k','m']
 for j,ds in enumerate(datasets):
     plt.figure(j,clear=True)
     for i, model in enumerate(config["models"]):
@@ -50,8 +50,9 @@ for j,ds in enumerate(datasets):
         df = models_dict[model]
         df_tmp = df[(df['name']==ds).values]
         df_ref_tmp = df_ref[(df_ref['name']==ds).values]
-        plt.plot(df_tmp[('red_rate','mean')],df_tmp[('f1','mean')],color=cols[i],label=model,marker='*')
-        plt.plot(df_ref_tmp[('red_rate', 'mean')], df_ref_tmp[('f1', 'mean')],color=cols[i],marker='x', markersize=13)
+        model_name = config["models_names"][model]
+        plt.plot(df_tmp[('red_rate','mean')],df_tmp[('f1','mean')],color=cols[i],label=model_name,marker='*')
+        plt.plot(df_ref_tmp[('red_rate', 'mean')], df_ref_tmp[('f1', 'mean')],color=cols[i],marker='x', markersize=13,linewidth=5)
     plt.xlabel("Reduction rate [-]",fontsize=font['size'])
     plt.ylabel("F1 [-]",fontsize=font['size'])
     plt.legend()

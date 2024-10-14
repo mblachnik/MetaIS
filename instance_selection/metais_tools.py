@@ -69,8 +69,8 @@ def generateMetaForDatasets(files : list, n_jobs: int = 1, dropColumns: list = [
     metaTransformer = ISMetaAttributesTransformer()
     out = []
 
-    if n_jobs > 1:
-        results = Parallel(n_jobs=n_jobs, prefer="threads", backend="loky")(delayed(generateMetaForDataset)(metaTransformer, dropColumns, dir, file, ext, doSave, verbose) for dir, file, ext in tqdm(files))
+    if n_jobs != 1:
+        results = Parallel(n_jobs=n_jobs, backend="loky")(delayed(generateMetaForDataset)(metaTransformer, dropColumns, dir, file, ext, doSave, verbose) for dir, file, ext in tqdm(files))
         out.extend(results)
     else:
         for dir, file, ext in tqdm(files):

@@ -30,7 +30,7 @@ def applyFile(dir_name: str, dat_name: str, dat_ext: str, dat: str, threshold:fl
     model_paths = []
     for model in config["models"]:
         model_paths.append(os.path.join(config["models_dir"], model, f"model_{dat}.dat_meta.pickl"))
-    model_meta = MetaIS(estimator_src=model_paths, threshold=threshold)
+    model_meta = MetaIS(estimator_src=modemain_apply_metaIS.pyl_paths, threshold=threshold)
 
     t1 = time.time()
     t1p = time.process_time()
