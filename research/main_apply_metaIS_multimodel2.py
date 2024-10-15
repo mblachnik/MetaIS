@@ -84,7 +84,7 @@ if __name__ == '__main__':
     thresholds = config["treshholds"]
     n_jobs = -2#config["n_jobs"]
     if n_jobs not in {1,0}:
-        results = Parallel(n_jobs=n_jobs,  backend="multiprocessing")(delayed(applyFile)(config, dir_name, dat_name, dat_ext, dat, thresholds) for dir_name, dat_name, dat_ext, dat in files)
+        results = Parallel(n_jobs=n_jobs,  backend='loky')(delayed(applyFile)(config, dir_name, dat_name, dat_ext, dat, thresholds) for dir_name, dat_name, dat_ext, dat in files)
         ress += [item for res in results for item in res] #Flatten results
     else:
         for dir_name, dat_name, dat_ext, dat in tqdm(files):

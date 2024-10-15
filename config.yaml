@@ -1,7 +1,7 @@
 models : [
- #         "HMEI",
+          "HMEI",
           "ENN",
-          "Drop3Keel",
+          #"Drop3Keel",
           "ICFKeel",
           "CCIS",
           #'multimodel'
@@ -21,7 +21,7 @@ data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
 #data_dir: "Y:\\Datasets\\tmp\\"
 models_dir: "Y:\\MetaIS\\models_large\\" #Location where models are sotred Note that it should be algorithm specific
 results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations are stored
-n_jobs: 5
+n_jobs: 2
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
             "php89ntbG",

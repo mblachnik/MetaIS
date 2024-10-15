@@ -85,10 +85,51 @@ if __name__ == '__main__':
                         "php89ntbG-5-4tra.dat.csv",
                         "php89ntbG-5-5tra.dat.csv"
                         ],
-            "ENN":[],
+            "ENN":["codrnaNorm-5-1tra.dat.csv",
+                   "codrnaNorm-5-2tra.dat.csv",
+                   "codrnaNorm-5-3tra.dat.csv",
+                   "codrnaNorm-5-4tra.dat.csv",
+                   "codrnaNorm-5-5tra.dat.csv",
+                   "covtype-5-1tra.dat.csv",
+                   "covtype-5-2tra.dat.csv",
+                   "covtype-5-3tra.dat.csv",
+                   "covtype-5-4tra.dat.csv",
+                   "covtype-5-5tra.dat.csv",
+                   "php89ntbG-5-1tra.dat.csv",
+                   "php89ntbG-5-2tra.dat.csv",
+                   "php89ntbG-5-3tra.dat.csv",
+                   "php89ntbG-5-4tra.dat.csv",
+                   "php89ntbG-5-5tra.dat.csv",],
             "Drop3Keel":[],
-            "ICFKeel":[],
-            "HMEI":[],
+            "ICFKeel":["codrnaNorm-5-1tra.dat.csv",
+                   "codrnaNorm-5-2tra.dat.csv",
+                   "codrnaNorm-5-3tra.dat.csv",
+                   "codrnaNorm-5-4tra.dat.csv",
+                   "codrnaNorm-5-5tra.dat.csv",
+                   "covtype-5-1tra.dat.csv",
+                   "covtype-5-2tra.dat.csv",
+                   "covtype-5-4tra.dat.csv",
+                   "covtype-5-5tra.dat.csv",
+                   "php89ntbG-5-1tra.dat.csv",
+                   "php89ntbG-5-2tra.dat.csv",
+                   "php89ntbG-5-3tra.dat.csv",
+                   "php89ntbG-5-4tra.dat.csv",
+                   "php89ntbG-5-5tra.dat.csv"],
+            "HMEI":["codrnaNorm-5-1tra.dat.csv",
+                    "codrnaNorm-5-2tra.dat.csv",
+                    "codrnaNorm-5-3tra.dat.csv",
+                    "codrnaNorm-5-4tra.dat.csv",
+                    "codrnaNorm-5-5tra.dat.csv",
+                    "covtype-5-1tra.dat.csv",
+                    "covtype-5-2tra.dat.csv",
+                    "covtype-5-3tra.dat.csv"
+                    "covtype-5-4tra.dat.csv",
+                    "covtype-5-5tra.dat.csv",
+                    "php89ntbG-5-1tra.dat.csv",
+                    "php89ntbG-5-2tra.dat.csv",
+                    "php89ntbG-5-3tra.dat.csv",
+                    "php89ntbG-5-4tra.dat.csv",
+                    "php89ntbG-5-5tra.dat.csv"],
             'multimodel':[],
             "1NN":[]
     }
@@ -111,7 +152,7 @@ if __name__ == '__main__':
         thresholds = config["treshholds"]
         n_jobs = config["n_jobs"]
         if n_jobs not in {1, 0}:
-            results = Parallel(n_jobs=n_jobs, backend="multiprocessing")(
+            results = Parallel(n_jobs=n_jobs, backend='loky')(
                 delayed(applyFile)(config, dir_name, dat_name, dat_ext, dat, thresholds, model) for
                 dir_name, dat_name, dat_ext, dat in files)
             ress += [item for res in results for item in res]  # Flatten results
@@ -121,9 +162,10 @@ if __name__ == '__main__':
                 ress += applyFile(config, dir_name, dat_name, dat_ext, dat, thresholds, model)
 
         res_df = pd.DataFrame(ress)
-        res_df.to_csv(getResultsFilePath(config, model, False, True))
-        perf = res_df.groupby(by=["name", "threshold"]).aggregate(["mean", "std"])
-        perf.reset_index(inplace=True)
-        perf.to_csv(getResultsFilePath(config, model, True, True))
-        print(perf)
+        if res_df.shape[0]>0:
+            res_df.to_csv(getResultsFilePath(config, model, False, True))
+            perf = res_df.groupby(by=["name", "threshold"]).aggregate(["mean", "std"])
+            perf.reset_index(inplace=True)
+            perf.to_csv(getResultsFilePath(config, model, True, True))
+            print(perf)
     print(time.time() - t_start)
