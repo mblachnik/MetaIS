@@ -31,11 +31,8 @@ for model in config["models"]:
     for i,(dir_name, dat_name, dat_ext, dat) in  enumerate(files):
         print(f"{i}/{len(files)}")
         if model not in ["1NN"]:
-            Xp_train, yp_train, stats = tools.read_data_and_IS(os.path.join(dir_name,
-                                                        dat_name+dat_ext),
-                                                  os.path.join(dir_name,
-                                                               dat_name  + dat_ext)
-                                                  )
+            Xp_train, yp_train, stats = tools.read_data_and_IS(os.path.join(dir_name,dat_name+dat_ext),
+                                                               os.path.join(dir_name,dat_name  + dat_ext))
         else:
             Xp_train, yp_train = tools.read_data(os.path.join(dir_name, dat_name + dat_ext))
             stats = tools.scoreIS(Xp_train, Xp_train)
@@ -53,7 +50,7 @@ for model in config["models"]:
         ress.append(res)
 
     res_df = pd.DataFrame(ress)
-    post_fix="_v5"
+    post_fix="_v6"
     res_df.to_csv(os.path.join(config["results_dir"]+model,f"results_IS{post_fix}.csv"))
     perf = res_df.groupby("name").aggregate(["mean","std"])
     perf.to_csv(os.path.join(config["results_dir"]+model,f"results_IS_agg{post_fix}.csv"))

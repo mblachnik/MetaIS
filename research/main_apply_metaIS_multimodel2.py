@@ -62,6 +62,10 @@ def applyFile(config:dict, dir_name: str, dat_name: str, dat_ext: str, dat: str,
           f"     Train:{os.path.join(dir_name, dat_name + dat_ext)} \n"
           f"     Test:{os.path.join(config['test_data_dir'], dat, dat_name.replace('tra', 'tst'))} \n"
           )
+    # Store intermediate results
+    res_all_df = pd.DataFrame(res_all)
+    is_model = "_".join(config["models"])
+    res_all_df.to_csv(getResultsFilePath(config, is_model, False, True, f"_{dat_name}"))
     return res_all
 
 if __name__ == '__main__':
@@ -82,7 +86,7 @@ if __name__ == '__main__':
 #%%
     ress = []
     thresholds = config["treshholds"]
-    n_jobs = -2#config["n_jobs"]
+    n_jobs = config["n_jobs"]
     if n_jobs not in {1,0}:
         results = Parallel(n_jobs=n_jobs,  backend='loky')(delayed(applyFile)(config, dir_name, dat_name, dat_ext, dat, thresholds) for dir_name, dat_name, dat_ext, dat in files)
         ress += [item for res in results for item in res] #Flatten results
@@ -92,9 +96,10 @@ if __name__ == '__main__':
             ress += applyFile(config, dir_name, dat_name, dat_ext, dat, thresholds)
 
     res_df = pd.DataFrame(ress)
-    res_df.to_csv(getResultsFilePath(config,"multimodel", False, True))
+    is_model = "_".join(config["models"])
+    res_df.to_csv(getResultsFilePath(config,is_model, False, True))
     perf = res_df.groupby(by=["name","threshold"]).aggregate(["mean","std"])
     perf.reset_index(inplace=True)
-    perf.to_csv(getResultsFilePath(config, "multimodel", True, True))
+    perf.to_csv(getResultsFilePath(config, is_model, True, True))
     print(perf)
     print(time.time()-t_start)

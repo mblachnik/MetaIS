@@ -1,11 +1,11 @@
 models : [
-          "HMEI",
-          "ENN",
-          #"Drop3Keel",
+#          "HMEI",
+#          "ENN",
           "ICFKeel",
           "CCIS",
-          #'multimodel'
-#          "1NN"
+#          "Drop3Keel",
+#          'multimodel'
+#         "1NN"
 ]
 
 models_names : {
