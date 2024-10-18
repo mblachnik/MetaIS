@@ -65,6 +65,6 @@ for dataset in config['datasets']:
 columns = pd.MultiIndex.from_product([config['models'], ['process_time_IS', 'process_time_meta_IS']])
 results_df = pd.DataFrame(results, index=config['datasets'], columns=columns).reset_index()
 results_df.rename(columns={'index': 'dataset'}, inplace=True)
-path = os.path.join(config["results_dir"], "summary_of_execution_time.csv")
+path = os.path.join(config["results_dir"], "summary_of_execution_time2.csv")
 results_df.to_csv(path, index=False)
     

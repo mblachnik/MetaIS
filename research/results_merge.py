@@ -13,7 +13,7 @@ for model in config['models']:
     list_df = []
 
     if os.path.exists(merged_res_path):
-        list_df.append(pd.read_csv(merged_res_path))
+        list_df.append(pd.read_csv(merged_res_path, index_col=0))
 
     merged_files = []
 
@@ -22,13 +22,13 @@ for model in config['models']:
         if plik.endswith('.dat.csv'):
             pelna_sciezka = os.path.join(katalog, plik)
             merged_files.append(plik)
-            list_df.append(pd.read_csv(pelna_sciezka))
+            list_df.append(pd.read_csv(pelna_sciezka, index_col=0))
 
     if(len(merged_files) > 0):
         df = pd.concat(list_df, ignore_index=True)
-
+        df.reset_index()
         df.to_csv(merged_res_path)
-        perf = df.groupby("name").aggregate(["mean","std"])
+        perf = df.groupby(["name", 'threshold']).aggregate(["mean","std"]).reset_index()
         perf.to_csv(merged_res_path_agg)
 
         if not os.path.exists(katalog_merged):

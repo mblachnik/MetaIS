@@ -1,11 +1,8 @@
 models : [
-#          "HMEI",
-#          "ENN",
-          "test - Copy",
-          "test",
-#          "Drop3Keel",
-#          'multimodel'
-#         "1NN"
+          "HMEI",
+          "CCIS",
+          "ENN",
+          "ICFKeel",
 ]
 
 models_names : {
@@ -50,8 +47,8 @@ datasets: [
 #       "splice",
 #       "splice",
 
-result_postfix: ["v13_large"]
+result_postfix: ["v15_large_marged"]
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]
-IS_result_postfix: ["v1", "v2"]
+IS_result_postfix: ["v13"]
