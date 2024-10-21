@@ -22,7 +22,7 @@ config = loadConfig()
 # results_dir
 
 dataset = "banana"
-dataDir = f"{config['data_dir']}\\{dataset}\\"
+dataDir = f"{config['data_dir']}{dataset}\\{dataset}\\"
 #%%
 data = pd.read_csv(f"{dataDir}{dataset}.dat.csv",sep=";")
 proto_idx = pd.read_csv(f"{dataDir}{dataset}.dat_proto.csv", sep=";").rename(columns={"id": "_id_"})

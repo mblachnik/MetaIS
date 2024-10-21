@@ -1,3 +1,6 @@
+"""
+Marge results obtained for individual datasets into a single dataset and then calculates average
+"""
 import shutil
 import pandas as pd
 import os

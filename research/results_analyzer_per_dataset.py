@@ -1,3 +1,7 @@
+"""
+Draw relation between prediction performance and compression. The plot draws it per dataset fir different models
+For a single dataset draw performances of different models
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,13 +22,13 @@ config = loadConfig()
 
 
 #%%
-results_files = ["results_MetaIS_agg_v12_large.csv",
+results_files = ["results_MetaIS_agg_v0_large.csv",
                  #"results_MetaIS_agg_v6.csv"
 #"results_MetaIS_agg_v_xxx.csv",
 #"results_MetaIS_agg_v_xxx1.csv"
                ]
 
-ref_result_file = "results_IS_agg_v5.csv"
+ref_result_file = "results_IS_agg_v0.csv"
 
 
 models_dict = {}
@@ -32,6 +36,7 @@ models_ref_dict = {}
 for model in config["models"]:
     dfs = []
     for file in results_files:
+        print(os.path.join(config["results_dir"] + model,file))
         temp = pd.read_csv(os.path.join(config["results_dir"] + model,file),header=[0,1])
         dfs.append(temp)
     models_dict[model] = pd.concat(dfs,axis=0)

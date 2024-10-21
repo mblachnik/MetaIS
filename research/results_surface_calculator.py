@@ -1,3 +1,7 @@
+"""
+
+"""
+#%%
 import os
 import pandas as pd
 import numpy as np
@@ -6,7 +10,7 @@ from scipy.interpolate import interp1d
 
 config = loadConfig()
 LICZBA_POMIAROW = 5
-columns = pd.MultiIndex.from_product([config['models'], ['mean_IS', 'std_IS', 'mean_metaIS', 'std_metaIS']])
+columns = pd.MultiIndex.from_product([config['models'], ["IS","MetaIS"],['mean', 'std']])
 
 def save_results(results: list, fileName: str):
     results_df = pd.DataFrame(results, index=list(datasets), columns=columns).reset_index()
@@ -19,12 +23,15 @@ datasets = set()
 
 df_1NN = pd.read_csv(getResultsFilePathWithPostfix(config, '1NN', False, False, "v0"),header=0)
 datasets.update(df_1NN['name'].unique())
-
+#%%
 for alg in config['models']:
+    print(alg)
+    print(getResultsFilePath(config, alg, False, True))
     df = pd.read_csv(getResultsFilePath(config, alg, False, True),header=0)
     df_ref = pd.DataFrame()
     ref_file_names = getResultsFilePaths(config, alg, False, False)
     for fileName in ref_file_names:
+        print(fileName)
         temp_df = pd.read_csv(fileName)
         df_ref = pd.concat([df_ref, temp_df], ignore_index=True)
     dfs.append((df, df_ref, alg))
@@ -34,7 +41,8 @@ results = []
 results_interp1d = []
 first_red_rate = 0.0
 
-for i,ds in enumerate(datasets):
+for j,ds in enumerate(datasets):
+    print(ds)
     row = []
     row_interp1d = []
     for df, df_ref, alg in dfs:

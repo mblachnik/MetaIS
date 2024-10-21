@@ -1,3 +1,6 @@
+"""
+The script generates a csv results file containing information on execution time on full dataset
+"""
 import csv
 import os
 import pandas as pd
