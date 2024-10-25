@@ -1,11 +1,15 @@
 import pickle
-from matplotlib import pyplot as plt
-import numpy as np
+import statistics
 import pandas as pd
 from instance_selection.meta_attributes_enum import MetaAttributesEnum
-from research.basics.utils import getBaseResultsFilePath, loadConfig, savePlotFig
+from research.basics.utils import getBaseResultsFilePath, loadConfig
 
 config = loadConfig()
+result_file_name = 'feat_imp_summary4.csv'
+
+#grouped_k = [[3,5], [9,15,23,33]]
+grouped_k = [[3, 5], [9, 15], [23, 33]]
+#grouped_k = []
 
 models = []
 for dataset in config['datasets']:
@@ -24,10 +28,30 @@ for model in models:
     forest_importance = pd.Series(imp, index=feature_names)
     results[model[2]][model[1]] = forest_importance
 
+k_dependent_feats = [
+    MetaAttributesEnum.sameClassNeighbors, 
+    MetaAttributesEnum.oppositeClassNeighbors,
+    MetaAttributesEnum.meanDistanceAnyClass,
+    MetaAttributesEnum.meanDistanceSameClass,
+    MetaAttributesEnum.meanDistanceOppositeClass,
+    ]
+
 for x, y_series_dict in results.items():
+    for dataset in config['datasets']:
+        for feat in k_dependent_feats:
+            for ks in grouped_k:
+                meanDistanceAnyClassGroupKey = feat('_'.join(map(str, ks)))
+                vals = {}
+                vals[meanDistanceAnyClassGroupKey] = []
+                for k in ks:
+                    meanDistanceAnyClassKey = feat(str(k))
+                    vals[meanDistanceAnyClassGroupKey].append(y_series_dict[dataset][meanDistanceAnyClassKey])
+                    del y_series_dict[dataset][meanDistanceAnyClassKey]
+                mean = statistics.mean(vals[meanDistanceAnyClassGroupKey])
+                y_series_dict[dataset][meanDistanceAnyClassGroupKey] = mean
+
     df = pd.DataFrame(y_series_dict)
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'Meta attribute'}, inplace=True)
-    filename = f'feat_imp_summary.csv'
-    path = getBaseResultsFilePath(config, x, filename)
+    path = getBaseResultsFilePath(config, x, result_file_name)
     df.to_csv(path, index=False)
