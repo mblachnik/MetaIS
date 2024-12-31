@@ -1,8 +1,9 @@
 models : [
-          "HMEI",
-          "CCIS",
-          "ENN",
-          "ICFKeel",
+          #"HMEI_ENN_ICFKeel_CCIS",
+          "HMEI_ICFKeel_CCIS",
+          "HMEI_ICFKeel_CCIS_Drop3Keel",
+          "ICFKeel_CCIS",
+          "ICFKeel_CCIS_Drop3Keel"
 ]
 
 models_names : {
@@ -47,8 +48,8 @@ datasets: [
 #       "splice",
 #       "splice",
 
-result_postfix: ["v15_large_marged"]
+result_postfix: ["v16_large"]
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]
-IS_result_postfix: ["v13"]
+IS_result_postfix: ["v5_temp"]
