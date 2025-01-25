@@ -1,3 +1,4 @@
+import os
 import pickle
 import statistics
 import pandas as pd
@@ -5,18 +6,25 @@ from instance_selection.meta_attributes_enum import MetaAttributesEnum
 from research.basics.utils import getBaseResultsFilePath, loadConfig
 
 config = loadConfig()
-result_file_name = 'feat_imp_summary4.csv'
+result_file_name = 'feat_imp_summary_merged_train_data.csv'
 
 #grouped_k = [[3,5], [9,15,23,33]]
 grouped_k = [[3, 5], [9, 15], [23, 33]]
 #grouped_k = []
 
+
+n_jobs = config["n_jobs"]
 models = []
-for dataset in config['datasets']:
+
+def loadModelsForDataset(dataset: str):
     for alg in config['models']:
-        with open(f"{config['models_dir']}{alg}\\model_{dataset}.dat_meta.pickl", 'rb') as f:
+        path = os.path.join(f"{config['models_dir']}{alg}", f"model_{dataset}.dat_meta.pickl")
+        with open(path, 'rb') as f:
             model = pickle.load(f)
-            models.append((model, dataset, alg))
+            return (model, dataset, alg)
+
+for dataset in config['datasets']:
+        models.append(loadModelsForDataset(dataset))
 
 results = {}
 

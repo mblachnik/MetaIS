@@ -23,7 +23,7 @@ data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
 #data_dir: "Y:\\Datasets\\tmp\\"
 models_dir: "Y:\\MetaIS\\multimodels\\" #Location where models are sotred Note that it should be algorithm specific
 results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations are stored
-n_jobs: 15
+n_jobs: 1
 test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
 datasets: [
            "php89ntbG",
@@ -31,21 +31,21 @@ datasets: [
             #"codrnaNorm",
             "abalone",
            "banana",
-            "letter",
+           "letter",
             "magic",
             "marketing",
             "nursery",
             "optdigits",
-            "page-blocks",
+           "page-blocks",
            "penbased",
            "phoneme",
             "ring",
-            "satimage",
-            "spambase",
-            "texture",
-            "twonorm",
-            "shuttle",
-            "electricity-normalized"
+           "satimage",
+           "spambase",
+           "texture",
+           "twonorm",
+           "shuttle",
+           "electricity-normalized"
 ]
 
 #"thyroid", #Dokładność 1NN mniejsza niż default
@@ -57,4 +57,4 @@ do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]
 #IS_result_postfix: ["merged_train_data"]
-IS_result_postfix: ["v5_temp"]
+IS_result_postfix: ["v5"]
