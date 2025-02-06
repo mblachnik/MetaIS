@@ -174,7 +174,11 @@ class MetaIS(BaseUnderSampler):
         models = []
         for src in self.estimator_src:
             with open(src, 'rb') as f:
-                models.append(pickle.load(f))
+                try:
+                    models.append(pickle.load(f))
+                except Exception as e:
+                    print(src)
+                    raise e
         return models
 
     def __resample(self, X, y, yp):
