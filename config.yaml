@@ -1,13 +1,5 @@
 models : [
-    #"HMEI",
-    #"ENN",
-            #"ICFKeel",
-            #"CCIS"
-          #"HMEI_ENN_ICFKeel_CCIS",
-          "HMEI_ICFKeel_CCIS",
-          #"HMEI_ICFKeel_CCIS_Drop3Keel",
-          #"ICFKeel_CCIS",
-          #"ICFKeel_CCIS_Drop3Keel"
+    "CCIS"
 ]
 
 models_names : {
@@ -18,41 +10,41 @@ models_names : {
     "ICFKeel":"ICF",
     "multimodel":"Meta model"
 }
-data_dir: "Y:\\Datasets\\MetaIS\\corrected\\Filtered by "
+data_dir: "D:\\MetaIS\\Datasets\\Filtered by "
 #UWAGA: podajac te katalogi trzeba pamiętac o stworzeniu podkatalogów w models i results tak aby dla danego IS wyniki zapisywaly sie w osobnych podkatalogach
 #data_dir: "Y:\\Datasets\\tmp\\"
-models_dir: "Y:\\MetaIS\\multimodels\\" #Location where models are sotred Note that it should be algorithm specific
-results_dir: "Y:\\MetaIS\\results\\" #Location where results of the calculations are stored
+models_dir: "D:\\MetaIS\\models\\" #Location where models are sotred Note that it should be algorithm specific
+results_dir: "D:\\MetaIS\\results\\" #Location where results of the calculations are stored
 n_jobs: 1
-test_data_dir: "Y:\\Datasets\\Datasets\\KeelNorm\\"
+test_data_dir: "D:\\MetaIS\\Datasets\\KeelNorm\\"
 datasets: [
-           "php89ntbG",
+           #"php89ntbG",
             #"covtype",
             #"codrnaNorm",
-            "abalone",
+            #"abalone",
            "banana",
-           "letter",
-            "magic",
-            "marketing",
-            "nursery",
-            "optdigits",
-           "page-blocks",
-           "penbased",
-           "phoneme",
-            "ring",
-           "satimage",
-           "spambase",
-           "texture",
-           "twonorm",
-           "shuttle",
-           "electricity-normalized"
+           #"letter",
+            #"magic",
+            #"marketing",
+            #"nursery",
+            #"optdigits",
+           #"page-blocks",
+           #"penbased",
+           #"phoneme",
+            #"ring",
+           #"satimage",
+           #"spambase",
+           #"texture",
+           #"twonorm",
+           #"shuttle",
+           #"electricity-normalized"
 ]
 
 #"thyroid", #Dokładność 1NN mniejsza niż default
 #       "splice",
 #       "splice",
 
-result_postfix: ["merged_train_data"]
+result_postfix: ["RandomForest"]
 do_models_cv : False
 treshholds: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 #treshholds: [0.9,0.92,0.94,0.96,0.98]
