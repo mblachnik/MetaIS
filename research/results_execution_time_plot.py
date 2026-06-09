@@ -25,7 +25,7 @@ def newline(p1, p2):
     ax.add_line(l)
     return l
 #%%
-data_dir = "data/results/results_postprocessing/"#"Y:\\MetaIS\\results\\results_postprocessing\\"
+data_dir = "Y:\\MetaIS\\results\\results_postprocessing\\"
 
 dat_dsc = pd.read_csv(os.path.join(data_dir,"datasets_2header.csv"),sep=",",header=[0,1]).set_index("Dataset",drop=True)
 dat_dsc = dat_dsc[[col for col in dat_dsc.columns if col[0]!="Id"]]
@@ -49,6 +49,7 @@ for i,model in enumerate(models):
     X= dat.loc[:, "samples"]
     plt.plot(X, Y1, "-x", color=col[i], label=model)
     plt.plot(X, Y2, ":x", color=col[i])
+    plt.show()
 
 b0=-30
 b = b0

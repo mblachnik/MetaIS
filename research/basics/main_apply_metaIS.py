@@ -20,13 +20,14 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
                                                     dat_name + dat_ext))
     X_test, y_test = tools.read_data(os.path.join(config["test_data_dir"], dat,
                                                   dat_name.replace("tra", "tst")))
-    model_path = os.path.join(config["models_dir"], is_model, f"model_{dat}.dat_meta.pickl")
+    model_path = os.path.join(config["models_dir"], is_model, f"model_php89ntbG.dat_meta.pickl")
     model_meta = MetaIS(estimator_src=model_path, threshold=thresholds[0], keep_proba=True)
 
     res_all = []
     t1 = time.time()
     t1p = time.process_time()
     Xp_train, yp_train = model_meta.fit_resample(X_train, y_train)
+    columns = Xp_train.columns
     model_mis = classifier
     model_mis.fit(Xp_train, yp_train)
     t2 = time.time()
@@ -35,13 +36,12 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
     dtp = t2p - t1p
 
     for threshold in thresholds:
-        model_mis = classifier
-        model_meta.resample_with_new_threshold(X_train, y_train, threshold)
-        Xp_train, yp_train = model_meta.fit_resample(X_train, y_train)
-        print("Klasy w yp_train:", set(yp_train))
+        model_mis = classifier #klasyfikator należy klonować
+        #Xp_train, yp_train = model_meta.fit_resample(X_train, y_train)
+        Xp_train, yp_train = model_meta.resample_with_new_threshold(X_train, y_train, threshold)
         try:
             model_mis.fit(Xp_train, yp_train)
-            X_test = X_test[Xp_train.columns]
+            X_test = X_test[columns]
             yp = model_mis.predict(X_test)
             res = tools.score(yp, y_test)
         except ValueError as e:
@@ -93,9 +93,14 @@ def applyMetaIS(classifier: ClassifierMixin):
 
         res_df = pd.DataFrame(ress)
         if res_df.shape[0]>0:
-            res_df.to_csv(getResultsFilePath(config, model, False, True))
+            path = getResultsFilePath(config, model, False, True)
+            print('zapis do ' + path)
+            res_df.to_csv(path)
             perf = res_df.groupby(by=["name", "threshold"]).aggregate(["mean", "std"])
             perf.reset_index(inplace=True)
-            perf.to_csv(getResultsFilePath(config, model, True, True))
+            path = getResultsFilePath(config, model, True, True)
+            print('zapis do ' + path)
+            perf.to_csv(path)
             print(perf)
+        
         

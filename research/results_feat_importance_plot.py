@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-dir = "D:\\Projects\\DataMining\\scripts\\CI\\2024_MetaIS\\" + "data\\results\\"
+dir = "Y:\\MetaIS\\results\\"
 
 models = ["CCIS","HMEI","ICFKeel","Drop3Keel","ENN"]
 
@@ -26,9 +26,34 @@ kGroups_names = ["k=3","k=5","k=9","k=15","k=23","k=33"]
 
 kGroup_names_dict = dict(zip(kGroups+rows_core,kGroups_names+rows_core_names))
 
+# def savePlot(i, dir, model):
+#     postfix = "_2"
+#     plt.figure(i,clear=True)
+#     me_norm.plot.bar()
+#     plt.tight_layout()
+#     plt.gcf().savefig(f"{dir}figs\\fig_feat_imp_k_detailed_{model}{postfix}.png")
+
+def savePlot(i, name, plot):
+    plt.figure(i, clear=True, figsize=(10, 6))  # większy rozmiar wykresu
+    ax = plot.plot.bar(color="skyblue", edgecolor="black")  # lepsze kolory i obramowanie
+
+    # Tytuł i etykiety osi
+    # ax.set_title("Feature Importance (normalized)", fontsize=14, fontweight="bold")
+    ax.set_xlabel("Features", fontsize=16)
+    ax.set_ylabel("Importance", fontsize=16)
+
+    # Poprawa czytelności etykiet
+    plt.xticks(rotation=45, ha="right", fontsize=14)  
+    plt.yticks(fontsize=14)
+
+    # Siatka dla łatwiejszego odczytu
+    ax.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
+    plt.gcf().savefig(f"{name}.png", dpi=300)
 
 for i,model in enumerate(models):
-    cur_dir = dir + model + "\\Feat_import\\"
+    cur_dir = dir + model + "\\"
     df = pd.read_csv(cur_dir+"feat_imp_summary4.csv")
     df = df.set_index("Meta attribute", drop=True)
     df.columns = df.iloc[0,:]
@@ -50,10 +75,7 @@ for i,model in enumerate(models):
             row += kGroup_names_dict[n2[-1]]
         new_names.append(row)
     me_norm.index = new_names
-    plt.figure(i,clear=True)
-    me_norm.plot.bar()
-    plt.tight_layout()
-    plt.gcf().savefig(f"{dir}figs\\fig_feat_imp_k_detailed_{model}.png")
+    savePlot(i, f"{dir}figs/fig_feat_imp_k_detailed_{model}", me_norm)
 
     res = {}
     for group in rows_core+row_groups:
@@ -62,12 +84,7 @@ for i,model in enumerate(models):
     group_imp = pd.Series(res)
     group_imp.index = [row_names_dict[row] for row in group_imp.index]
 
-    plt.figure(10+i,clear=True)
-    group_imp.plot.bar()
-    plt.tight_layout()
-    plt.gcf().savefig(f"{dir}figs\\fig_feat_imp_type_{model}.png")
-
-
+    savePlot(10+i, f"{dir}figs\\fig_feat_imp_type_{model}", group_imp)
 
     res_k = {row:me.loc[row]for row in rows_core}
     for group in kGroups:
@@ -76,7 +93,4 @@ for i,model in enumerate(models):
     group_imp_k = pd.Series(res_k)
     group_imp_k.index = [kGroup_names_dict[row] for row in group_imp_k.index]
 
-    plt.figure(20+i,clear=True)
-    group_imp_k.plot.bar()
-    plt.tight_layout()
-    plt.gcf().savefig(f"{dir}figs\\fig_feat_imp_k_{model}.png")
+    savePlot(20+i, f"{dir}figs\\fig_feat_imp_k_{model}", group_imp_k)
