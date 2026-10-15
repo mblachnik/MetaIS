@@ -3,9 +3,10 @@ Script to run MetaIS
 note that first other two scripts must be executed that is it must have metamodel but in order to have meta model first we have to run meta attributes generation
 """
 
-from time import time
+import time
 
 from joblib import Parallel, delayed
+import numpy as np
 import pandas as pd
 from instance_selection.metais import MetaIS
 import sklearn.neighbors as knn
@@ -13,6 +14,14 @@ import os
 import experiments.tools as tools
 from tqdm import tqdm
 from research.basics.utils import getBaseResultsFilePath, loadConfig
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
+from functools import partial
 
 
 # %%
@@ -31,19 +40,27 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
     model_path = os.path.join(config["models_dir"], is_model, f"model_{dat}.dat_meta.pickl")
     model_meta = MetaIS(estimator_src=model_path, threshold=thresholds[0], keep_proba=True)
 
+    model_meta.fit_resample(X_train, y_train)
     res_all = []
 
     for threshold in thresholds:
         Xp_train, yp_train = model_meta.resample_with_new_threshold(X_train, y_train, threshold)
-        is_metrics = tools.scoreIS(X_train, Xp_train)
-        X_test_aligned = X_test[Xp_train.columns]
+        Xp_train, yp_train = model_meta.fit_resample(X_train, y_train)
+
         n_samples_available = len(Xp_train)
+        if n_samples_available == 0:
+            continue
+            
+        unique_classes = np.unique(yp_train)
+        if len(unique_classes) < 2:
+            print(f"       => Ominięto threshold {threshold} dla {dat_name}: pozostała tylko 1 klasa ({unique_classes[0]})")
+            continue
+
+        is_metrics = tools.scoreIS(X_train, Xp_train)
+        X_test = X_test[Xp_train.columns]
 
         for clf_name, builder in model_factories.items():
-                k_val = int(clf_name.replace("NN", ""))
-                if k_val > n_samples_available:
-                    continue
-
+            try:
                 model_mis = builder()
 
                 # Pomiar czasu treningu / budowy indeksu klasyfikatora
@@ -53,7 +70,7 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
 
                 # Pomiar czasu predykcji (kluczowy zysk dla kNN)
                 t_pred_start = time.perf_counter()
-                yp = model_mis.predict(X_test_aligned)
+                yp = model_mis.predict(X_test)
                 pred_time = time.perf_counter() - t_pred_start
 
                 res = tools.score(yp, y_test)
@@ -66,6 +83,11 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
                 res = res | is_metrics
 
                 res_all.append(res)
+            except ValueError as e:
+                if "Expected n_neighbors <= n_samples_fit" in str(e):
+                    print(f"[POMINIĘTO] Zbiór {dat_name} / {clf_name}: za mało próbek dla kNN ({e})")
+                    continue  # lub zwracasz pusty wynik
+                raise e  # Inne błędy ValueError przepuszczamy dalej
 
     print(f"Finished: \n"
           f"     Train:{os.path.join(dir_name, dat_name + dat_ext)} \n"
@@ -73,7 +95,7 @@ def applyFile(config: dict, dir_name: str, dat_name: str, dat_ext: str, dat: str
           )
     # Store intermediate results
     res_all_df = pd.DataFrame(res_all)
-    res_all_df.to_csv(getBaseResultsFilePath(config, is_model, f"_{dat_name}_{model_name}"))
+    res_all_df.to_csv(getBaseResultsFilePath(config, is_model, f"_{dat_name}.csv"))
     return res_all
 
 
@@ -85,7 +107,16 @@ if __name__ == '__main__':
         "3NN": lambda: knn.KNeighborsClassifier(n_neighbors=3),
         "5NN": lambda: knn.KNeighborsClassifier(n_neighbors=5),
         "7NN": lambda: knn.KNeighborsClassifier(n_neighbors=7),
-        "9NN": lambda: knn.KNeighborsClassifier(n_neighbors=9)
+        "9NN": lambda: knn.KNeighborsClassifier(n_neighbors=9),
+        # 2. Support Vector Machine (wymaga skalowania)
+        "SVM_RBF": lambda: make_pipeline(StandardScaler(), SVC(kernel="rbf", C=1.0)),
+        # 3. Modele drzewiaste i zespołowe
+        "RandomForest": partial(RandomForestClassifier, n_estimators=100, random_state=42, n_jobs=1),
+        "DecisionTree": partial(DecisionTreeClassifier, random_state=42),
+        # 4. Model probabilistyczny
+        "NaiveBayes": GaussianNB,
+        # 5. Model liniowy (wymaga skalowania)
+        "LogisticRegression": lambda: make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
     }
 
     for model in config["models"]:
